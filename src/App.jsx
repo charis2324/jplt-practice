@@ -10,7 +10,7 @@ const App = () => {
     const fetchQuizData = async () => {
       try {
         const response = await fetch(
-          'https://raw.githubusercontent.com/charis2324/jlpt/main/mc/ch-01-gq-01.json'
+          'https://raw.githubusercontent.com/charis2324/jlpt/main/mc/01.json'
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
