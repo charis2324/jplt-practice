@@ -7,19 +7,20 @@ const MultipleChoiceQuiz = ({ quizData }) => {
   );
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const [reportedQuestions, setReportedQuestions] = useState([]);
 
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
       const newSelectedAnswers = [...selectedAnswers];
       newSelectedAnswers[questionIndex] = answer;
       setSelectedAnswers(newSelectedAnswers);
-      setError(null); // Clear any previous error when an answer is selected
+      setError(null);
     }
   };
 
   const handleSubmitQuiz = () => {
     const unansweredQuestions = selectedAnswers.reduce((acc, answer, index) => {
-      if (answer === null) acc.push(index + 1);
+      if (answer === null && !reportedQuestions.includes(index)) acc.push(index + 1);
       return acc;
     }, []);
 
@@ -39,15 +40,24 @@ const MultipleChoiceQuiz = ({ quizData }) => {
     setQuizSubmitted(false);
     setSelectedAnswers(Array(quizData.questions.length).fill(null));
     setError(null);
+    setReportedQuestions([]);
+  };
+
+  const handleReportQuestion = (questionId) => {
+    const questionIndex = quizData.questions.findIndex(q => q.id === questionId);
+    if (questionIndex !== -1 && !reportedQuestions.includes(questionIndex)) {
+      setReportedQuestions([...reportedQuestions, questionIndex]);
+    }
   };
 
   const calculateScore = () => {
     return selectedAnswers.reduce((score, answer, index) => {
-      return (
-        score + (answer === quizData.questions[index].correctAnswer ? 1 : 0)
-      );
+      if (reportedQuestions.includes(index)) return score;
+      return score + (answer === quizData.questions[index].correctAnswer ? 1 : 0);
     }, 0);
   };
+
+  const validQuestionCount = quizData.questions.length - reportedQuestions.length;
 
   return (
     <div className="container mx-auto p-4">
@@ -58,13 +68,19 @@ const MultipleChoiceQuiz = ({ quizData }) => {
             question={question.question.japanese}
             options={question.options}
             correctAnswer={question.correctAnswer}
-            showCorrectAnswer={quizSubmitted}
+            showCorrectAnswer={quizSubmitted || reportedQuestions.includes(index)}
             selectedOption={selectedAnswers[index]}
             onOptionSelect={(option) => handleAnswerSelect(index, option)}
+            onReportQuestion={handleReportQuestion}
           />
-          {quizSubmitted && question.explanation && (
+          {(quizSubmitted || reportedQuestions.includes(index)) && question.explanation && (
             <div className="mt-4 p-4 bg-yellow-100 rounded-md">
               <p className="text-yellow-800">{question.explanation}</p>
+            </div>
+          )}
+          {reportedQuestions.includes(index) && (
+            <div className="mt-4 p-4 bg-red-100 rounded-md">
+              <p className="text-red-800">This question has been reported and will not be included in the final score.</p>
             </div>
           )}
         </div>
@@ -87,7 +103,7 @@ const MultipleChoiceQuiz = ({ quizData }) => {
         <div className="mt-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
           <p className="text-xl mb-4">
-            Your score: {calculateScore()} / {quizData.questions.length}
+            Your score: {calculateScore()} / {validQuestionCount}
           </p>
           <button
             onClick={handleRestartQuiz}

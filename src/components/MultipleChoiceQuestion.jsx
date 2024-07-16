@@ -8,6 +8,7 @@ const MultipleChoiceQuestion = ({
   showCorrectAnswer,
   selectedOption,
   onOptionSelect,
+  onReportQuestion,
 }) => {
   const getOptionClass = (optionKey) => {
     if (!showCorrectAnswer) {
@@ -27,9 +28,17 @@ const MultipleChoiceQuestion = ({
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-      <div className="mb-4">
-        <span className="font-bold text-lg text-blue-600">Question {id}:</span>
-        <p className="mt-2 text-gray-800">{question}</p>
+      <div className="mb-4 flex justify-between items-start">
+        <div>
+          <span className="font-bold text-lg text-blue-600">Question {id}:</span>
+          <p className="mt-2 text-gray-800">{question}</p>
+        </div>
+        <button
+          onClick={() => onReportQuestion(id)}
+          className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors text-sm font-medium"
+        >
+          Report Low Quality
+        </button>
       </div>
       <div className="space-y-2">
         {Object.entries(options).map(([key, value]) => (
