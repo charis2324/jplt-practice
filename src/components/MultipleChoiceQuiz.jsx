@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
+import { report_question } from '../db';
 
 const MultipleChoiceQuiz = ({ quizData }) => {
   const [selectedAnswers, setSelectedAnswers] = useState(
@@ -47,6 +48,7 @@ const MultipleChoiceQuiz = ({ quizData }) => {
     const questionIndex = quizData.questions.findIndex(q => q.id === questionId);
     if (questionIndex !== -1 && !reportedQuestions.includes(questionIndex)) {
       setReportedQuestions([...reportedQuestions, questionIndex]);
+      report_question(questionId);
     }
   };
 
@@ -64,7 +66,8 @@ const MultipleChoiceQuiz = ({ quizData }) => {
       {quizData.questions.map((question, index) => (
         <div key={question.id} className="mb-8">
           <MultipleChoiceQuestion
-            id={question.id}
+            question_number={index + 1}
+            question_id={question.id}
             question={question.question.japanese}
             options={question.options}
             correctAnswer={question.correctAnswer}

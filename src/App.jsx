@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MultipleChoiceQuiz from './components/MultipleChoiceQuiz';
-import { increment_column_by_question_id, select_n_random_questions } from './db';
-console.log(await increment_column_by_question_id(1, 'times_answered_incorrectly'))
+import { get_random_quiz_data } from './db';
+
 const App = () => {
   const [quizData, setQuizData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -10,13 +10,14 @@ const App = () => {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        const response = await fetch(
-          'https://raw.githubusercontent.com/charis2324/jlpt/main/mc/03.json'
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        // const response = await fetch(
+        //   'https://raw.githubusercontent.com/charis2324/jlpt/main/mc/03.json'
+        // );
+        // if (!response.ok) {
+        //   throw new Error(`HTTP error! status: ${response.status}`);
+        // }
+        // const data = await response.json();
+        const data = await get_random_quiz_data(50);
         setQuizData(data);
         setIsLoading(false);
       } catch (e) {

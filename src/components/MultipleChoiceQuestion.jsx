@@ -1,7 +1,8 @@
 import React from 'react';
 
 const MultipleChoiceQuestion = ({
-  id,
+  question_number,
+  question_id,
   question,
   options,
   correctAnswer,
@@ -30,11 +31,11 @@ const MultipleChoiceQuestion = ({
     <div className="bg-white shadow-md rounded-lg p-6 mb-6">
       <div className="mb-4 flex justify-between items-start">
         <div>
-          <span className="font-bold text-lg text-blue-600">Question {id}:</span>
+          <span className="font-bold text-lg text-blue-600">Question {question_number}:</span>
           <p className="mt-2 text-gray-800">{question}</p>
         </div>
         <button
-          onClick={() => onReportQuestion(id)}
+          onClick={() => onReportQuestion(question_id)}
           className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors text-sm font-medium"
         >
           Report Low Quality
@@ -50,7 +51,7 @@ const MultipleChoiceQuestion = ({
           >
             <input
               type="radio"
-              name={`question-${id}`}
+              name={`question-${question_number}`}
               value={key}
               checked={selectedOption === key}
               onChange={() => onOptionSelect(key)}
