@@ -32,7 +32,6 @@ const MultipleChoiceQuestion = ({
       <div className="mb-2 flex justify-between items-start">
         <div>
           <span className="font-bold text-lg text-blue-600">Q {question_number + 1}:</span>
-          {/* <p className="mt-2 text-gray-800">{question}</p> */}
         </div>
         <button
           onClick={() => onReportQuestion(question_id)}
