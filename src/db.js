@@ -2,37 +2,31 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
 
-async function increment_times_answered_correctly(question_id) {
+async function increment_column_by_question_id(question_id, column) {
     let { data, error } = await supabase
-        .from('questions')
-        .select('times_answered_correctly')
-        .eq('question_id', question_id)
-        .single()
-
-    if (error) {
-        console.error('Error fetching question:', error)
-        return
-    }
-
-    if (!data) {
-        console.error('Question not found')
-        return
-    }
-
-    // Increment the value
-    const newValue = (data.times_answered_correctly || 0) + 1
-
-    // Update the row with the new value
-    const { data: updatedData, error: updateError } = await supabase
-        .from('questions')
-        .update({ times_answered_correctly: newValue })
-        .eq('question_id', question_id)
-
-    if (updateError) {
-        console.error('Error updating question:', updateError)
-        return
-    }
-
-    console.log('Successfully incremented times_answered_correctly')
-    return newValue
+        .rpc('increment_column_by_question_id', {
+            p_column: column,
+            p_question_id: question_id
+        })
+    if (error) console.error(error)
+    return data
 }
+
+async function select_n_random_questions(n) {
+    try {
+        const { data, error } = await supabase
+            .from('questions')
+            .select('*')
+            .order('RANDOM()')
+            .limit(n)
+
+        if (error) throw error
+
+        return data
+    } catch (error) {
+        console.error('Error fetching random data:', error)
+        return null
+    }
+}
+
+export { increment_column_by_question_id, select_n_random_questions };

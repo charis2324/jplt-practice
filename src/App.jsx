@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import MultipleChoiceQuiz from './components/MultipleChoiceQuiz';
-
+import { increment_column_by_question_id, select_n_random_questions } from './db';
+console.log(await increment_column_by_question_id(1, 'times_answered_incorrectly'))
 const App = () => {
   const [quizData, setQuizData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
