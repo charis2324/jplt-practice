@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import MultipleChoiceQuiz from './components/MultipleChoiceQuiz';
 import { get_random_quiz_data } from './db';
 
@@ -7,28 +7,28 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchQuizData = async () => {
-      try {
-        // const response = await fetch(
-        //   'https://raw.githubusercontent.com/charis2324/jlpt/main/mc/03.json'
-        // );
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error! status: ${response.status}`);
-        // }
-        // const data = await response.json();
-        const data = await get_random_quiz_data(50);
-        setQuizData(data);
-        setIsLoading(false);
-      } catch (e) {
-        console.error('There was a problem fetching the quiz data:', e);
-        setError('Failed to load quiz data. Please try again later.');
-        setIsLoading(false);
-      }
-    };
-
-    fetchQuizData();
+  const fetchQuizData = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const data = await get_random_quiz_data(50);
+      setQuizData(data);
+      setError(null);
+    } catch (e) {
+      console.error('There was a problem fetching the quiz data:', e);
+      setError('Failed to load quiz data. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchQuizData();
+  }, [fetchQuizData]);
+
+  const handleNextQuiz = useCallback(async () => {
+    await fetchQuizData();
+    window.scrollTo(0, 0);
+  }, [fetchQuizData]);
 
   if (isLoading) {
     return <div className="text-center mt-8">Loading quiz data...</div>;
@@ -42,7 +42,10 @@ const App = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">Japanese Quiz</h1>
       {quizData ? (
-        <MultipleChoiceQuiz quizData={quizData} />
+        <MultipleChoiceQuiz 
+          quizData={quizData} 
+          onNextQuiz={handleNextQuiz} 
+        />
       ) : (
         <div className="text-center mt-8">No quiz data available.</div>
       )}

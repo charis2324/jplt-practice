@@ -29,10 +29,10 @@ const MultipleChoiceQuestion = ({
 
   return (
     <div className="bg-white shadow-md rounded-lg p-6 mb-6">
-      <div className="mb-4 flex justify-between items-start">
+      <div className="mb-2 flex justify-between items-start">
         <div>
-          <span className="font-bold text-lg text-blue-600">Question {question_number}:</span>
-          <p className="mt-2 text-gray-800">{question}</p>
+          <span className="font-bold text-lg text-blue-600">Q {question_number + 1}:</span>
+          {/* <p className="mt-2 text-gray-800">{question}</p> */}
         </div>
         <button
           onClick={() => onReportQuestion(question_id)}
@@ -41,6 +41,7 @@ const MultipleChoiceQuestion = ({
           Report Low Quality
         </button>
       </div>
+      <p className="mb-4 text-gray-800">{question}</p>
       <div className="space-y-2">
         {Object.entries(options).map(([key, value]) => (
           <label

@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
-import { report_question } from '../db';
+import { report_question, report_answered_incorrectly, report_answered_correctly } from '../db';
 
-const MultipleChoiceQuiz = ({ quizData }) => {
+
+const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
+  const correctAnswers = quizData.questions.map(q => q.correctAnswer);
   const [selectedAnswers, setSelectedAnswers] = useState(
     Array(quizData.questions.length).fill(null)
   );
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [error, setError] = useState(null);
   const [reportedQuestions, setReportedQuestions] = useState([]);
-
+  
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
       const newSelectedAnswers = [...selectedAnswers];
@@ -18,7 +20,16 @@ const MultipleChoiceQuiz = ({ quizData }) => {
       setError(null);
     }
   };
-
+  const submitResult = () => {
+    quizData.questions.forEach((question, index) => {
+      if (!reportedQuestions.includes(index)) {
+        const isCorrect = selectedAnswers[index] === correctAnswers[index];
+        const reportFunction = isCorrect ? report_answered_correctly : report_answered_incorrectly;
+        reportFunction(question.id);
+        console.log(index, isCorrect)
+      }
+    });
+  }
   const handleSubmitQuiz = () => {
     const unansweredQuestions = selectedAnswers.reduce((acc, answer, index) => {
       if (answer === null && !reportedQuestions.includes(index)) acc.push(index + 1);
@@ -34,6 +45,7 @@ const MultipleChoiceQuiz = ({ quizData }) => {
     } else {
       setQuizSubmitted(true);
       setError(null);
+      submitResult();
     }
   };
 
@@ -66,7 +78,7 @@ const MultipleChoiceQuiz = ({ quizData }) => {
       {quizData.questions.map((question, index) => (
         <div key={question.id} className="mb-8">
           <MultipleChoiceQuestion
-            question_number={index + 1}
+            question_number={index}
             question_id={question.id}
             question={question.question.japanese}
             options={question.options}
@@ -103,7 +115,7 @@ const MultipleChoiceQuiz = ({ quizData }) => {
           Submit Quiz
         </button>
       ) : (
-        <div className="mt-8 text-center">
+        <div className="mt-8 text-center space-x-3">
           <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
           <p className="text-xl mb-4">
             Your score: {calculateScore()} / {validQuestionCount}
@@ -112,7 +124,13 @@ const MultipleChoiceQuiz = ({ quizData }) => {
             onClick={handleRestartQuiz}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
-            Restart Quiz
+            Reset Quiz
+          </button>
+          <button
+            onClick={() => onNextQuiz()}
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Next Quiz
           </button>
         </div>
       )}

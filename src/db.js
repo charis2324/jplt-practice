@@ -14,7 +14,12 @@ async function increment_column_by_question_id(question_id, column) {
 function report_question(question_id){
     increment_column_by_question_id(question_id, 'times_flagged_bad');
 }
-
+function report_answered_incorrectly(question_id){
+    increment_column_by_question_id(question_id, 'times_answered_incorrectly');
+}
+function report_answered_correctly(question_id){
+    increment_column_by_question_id(question_id, 'times_answered_correctly');
+}
 async function select_n_random_questions(n) {
     const { data, error } = await supabase
         .rpc('get_n_random_questions', { n })
@@ -51,4 +56,4 @@ async function get_random_quiz_data(n) {
     return parseQuestions(rows)
 }
 
-export { increment_column_by_question_id, select_n_random_questions, get_random_quiz_data, report_question };
+export { increment_column_by_question_id, select_n_random_questions, get_random_quiz_data, report_question, report_answered_incorrectly,report_answered_correctly };
