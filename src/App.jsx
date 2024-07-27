@@ -10,12 +10,10 @@ const App = () => {
   const [quizConfig, setQuizConfig] = useState({ questionCount: 10, jlptLevel: 5 });
   const [quizStarted, setQuizStarted] = useState(false);
 
-  console.log(`configor: ${JSON.stringify(quizConfig)}`)
 
   const fetchQuizData = useCallback(async () => {
     setIsLoading(true);
     try {
-      console.log(quizConfig);
       const data = await get_random_quiz_data(quizConfig.questionCount, quizConfig.jlptLevel);
       setQuizData(data);
       setError(null);

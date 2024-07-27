@@ -2,7 +2,6 @@ import React from 'react';
 
 const QuizConfigurator = ({ onConfigChange, currentConfig, onStart }) => {
   const options = [5, 10, 50];
-  console.log(`configor: ${JSON.stringify(currentConfig)}`)
   const handleJLPTLevelCHange = (e) => {
     onConfigChange({...currentConfig, jlptLevel: Number(e.target.value)})
   }
