@@ -7,13 +7,16 @@ const App = () => {
   const [quizData, setQuizData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [quizConfig, setQuizConfig] = useState({ questionCount: 10 });
+  const [quizConfig, setQuizConfig] = useState({ questionCount: 10, jlptLevel: 5 });
   const [quizStarted, setQuizStarted] = useState(false);
+
+  console.log(`configor: ${JSON.stringify(quizConfig)}`)
 
   const fetchQuizData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await get_random_quiz_data(quizConfig.questionCount);
+      console.log(quizConfig);
+      const data = await get_random_quiz_data(quizConfig.questionCount, quizConfig.jlptLevel);
       setQuizData(data);
       setError(null);
       setQuizStarted(true);
@@ -23,7 +26,7 @@ const App = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [quizConfig.questionCount]);
+  }, [quizConfig.questionCount, quizConfig.jlptLevel]);
 
   const handleNextQuiz = useCallback(async () => {
     await fetchQuizData();

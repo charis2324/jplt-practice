@@ -20,9 +20,9 @@ function report_answered_incorrectly(question_id){
 function report_answered_correctly(question_id){
     increment_column_by_question_id(question_id, 'times_answered_correctly');
 }
-async function select_n_random_questions(n) {
+async function select_n_random_questions(n, input_jlpt_level=null) {
     const { data, error } = await supabase
-        .rpc('get_n_random_questions', { n })
+        .rpc('get_n_random_questions', { n, input_jlpt_level })
     if (error) throw new Error(`Failed to select random questions: ${error.message}`)
     return data
 }
@@ -48,11 +48,17 @@ function parseQuestions(inputArray) {
     };
 }
 
-async function get_random_quiz_data(n) {
+async function get_random_quiz_data(n, input_jlpt_level=null) {
     if (typeof n !== 'number' || n <= 0) {
         throw new Error('n must be a positive number')
     }
-    const rows = await select_n_random_questions(n)
+    if(typeof input_jlpt_level !== 'number' && input_jlpt_level !== null){
+        throw new Error('input_jlpt_level must be a positive number or null')
+    }
+    if(typeof input_jlpt_level === 'number' && input_jlpt_level < 1  &&  input_jlpt_level > 5){
+        throw new Error('input_jlpt_level must be 1 ~ 5')
+    }
+    const rows = await select_n_random_questions(n, input_jlpt_level)
     return parseQuestions(rows)
 }
 
