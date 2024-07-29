@@ -1,6 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import MultipleChoiceQuiz from './components/MultipleChoiceQuiz';
 import QuizConfigurator from './components/QuizConfigurator';
+import QuestionInstruction from './components/QuestionInstruction ';
 import { get_random_quiz_data } from './db';
 
 const App = () => {
@@ -53,11 +54,12 @@ const App = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">JLPT Quiz</h1>
       {!quizStarted && (
-        <QuizConfigurator 
-          onConfigChange={handleConfigChange} 
-          currentConfig={quizConfig} 
-          onStart={handleStart}
-        />
+        <><QuizConfigurator
+          onConfigChange={handleConfigChange}
+          currentConfig={quizConfig}
+          onStart={handleStart} />
+          <QuestionInstruction />
+          </>
       )}
       {quizStarted && quizData ? (
         <MultipleChoiceQuiz 
