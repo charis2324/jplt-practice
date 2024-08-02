@@ -20,3 +20,7 @@ export const onAuthStateChange = (callback) => {
 export const getCurrentUser = () => {
   return auth.currentUser;
 };
+
+export const signOut = () => {
+    auth.signOut();
+}

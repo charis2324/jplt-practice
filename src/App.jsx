@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import HomePage from './pages/HomePage';
 import { onAuthStateChange } from './auth';
-
+import QuestionInstruction from './components/QuestionInstruction ';
 const App = () => {
   const [currentUser, setCurrentUser] = useState(null)
   const [loading, setLoading] = useState(null)
@@ -15,8 +15,10 @@ const App = () => {
       return () => unsubscribe()
     }, []
   )
-  return (
-    !currentUser && <HomePage />
-  )
+  if(!currentUser){
+    return <HomePage/>
+  }else{
+    return <QuestionInstruction/>
+  }
 }
 export default App;
