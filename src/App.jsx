@@ -1,74 +1,22 @@
-import React, { useState, useCallback } from 'react';
-import MultipleChoiceQuiz from './components/MultipleChoiceQuiz';
-import QuizConfigurator from './components/QuizConfigurator';
-import QuestionInstruction from './components/QuestionInstruction ';
-import { get_random_quiz_data } from './db';
+import React, { useState, useEffect } from 'react';
+import HomePage from './pages/HomePage';
+import { onAuthStateChange } from './auth';
 
 const App = () => {
-  const [quizData, setQuizData] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [quizConfig, setQuizConfig] = useState({ questionCount: 10, jlptLevel: 5 });
-  const [quizStarted, setQuizStarted] = useState(false);
-
-
-  const fetchQuizData = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const data = await get_random_quiz_data(quizConfig.questionCount, quizConfig.jlptLevel);
-      setQuizData(data);
-      setError(null);
-      setQuizStarted(true);
-    } catch (e) {
-      console.error('There was a problem fetching the quiz data:', e);
-      setError('Failed to load quiz data. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [quizConfig.questionCount, quizConfig.jlptLevel]);
-
-  const handleNextQuiz = useCallback(async () => {
-    await fetchQuizData();
-    window.scrollTo(0, 0);
-  }, [fetchQuizData]);
-
-  const handleConfigChange = (newConfig) => {
-    setQuizConfig((prevConfig) => ({ ...prevConfig, ...newConfig }));
-  };
-
-  const handleStart = () => {
-    setQuizStarted(false);
-    setQuizData(null);
-    fetchQuizData();
-  };
-
-  if (isLoading) {
-    return <div className="text-center mt-8">Loading quiz data...</div>;
-  }
-
-  if (error) {
-    return <div className="text-center mt-8 text-red-600">{error}</div>;
-  }
-
+  const [currentUser, setCurrentUser] = useState(null)
+  const [loading, setLoading] = useState(null)
+  console.log(currentUser)
+  useEffect(
+    () => {
+      const unsubscribe = onAuthStateChange((user) => {
+        setCurrentUser(user)
+        setLoading(false)
+      })
+      return () => unsubscribe()
+    }, []
+  )
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">JLPT Quiz</h1>
-      {!quizStarted && (
-        <><QuizConfigurator
-          onConfigChange={handleConfigChange}
-          currentConfig={quizConfig}
-          onStart={handleStart} />
-          <QuestionInstruction />
-          </>
-      )}
-      {quizStarted && quizData ? (
-        <MultipleChoiceQuiz 
-          quizData={quizData} 
-          onNextQuiz={handleNextQuiz} 
-        />
-      ) : null}
-    </div>
-  );
-};
-
+    !currentUser && <HomePage />
+  )
+}
 export default App;
