@@ -1,23 +1,43 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react'
-import { supabase } from '../db'
+import { supabase, get_user_profile } from '../db'
 
 export const AuthContext = createContext()
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [userLoading, setUserLoading] = useState(true)
+  const [profile, setProfile] = useState(null)
+  const [profileLoading, setProfileLoading] = useState(true)
+
+  const fetchProfile = async () => {
+    if (user) {
+      // console.log('Update profile')
+      try {
+        setProfileLoading(true);
+        const userProfile = await get_user_profile(user.id)
+        setProfile(userProfile)
+      } catch (error) {
+        console.error('Error fetching user profile:', error)
+      }finally{
+        setProfileLoading(false);
+      }
+    } else {
+      setProfile(null)
+    }
+  }
 
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
-      setLoading(false)
+      setUserLoading(false)
     }
 
     fetchUser()
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        // console.log(event)
         const currentUser = session?.user
         setUser(currentUser ?? null)
       }
@@ -27,6 +47,10 @@ export const AuthProvider = ({ children }) => {
       subscription.unsubscribe()
     }
   }, [])
+
+  useEffect(() => {
+    fetchProfile()
+  }, [user])
 
   const login = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -57,14 +81,16 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     user,
+    profile,
     login,
     logout,
     register,
-    loading,
+    fetchProfile,
+    loading: userLoading || profileLoading,
   }
 
-  useEffect(()=>{console.log(user)}, [user])
-
+  // useEffect(()=>{console.log(user)}, [user])
+  // useEffect(()=>{console.log(profile)}, [profile])
   return (
     <AuthContext.Provider value={value}>
       {children}
