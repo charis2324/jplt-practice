@@ -62,4 +62,4 @@ async function get_random_quiz_data(n, input_jlpt_level=null) {
     return parseQuestions(rows)
 }
 
-export { increment_column_by_question_id, select_n_random_questions, get_random_quiz_data, report_question, report_answered_incorrectly,report_answered_correctly };
+export { increment_column_by_question_id, select_n_random_questions, get_random_quiz_data, report_question, report_answered_incorrectly,report_answered_correctly, supabase };
