@@ -2,6 +2,16 @@ import { createClient } from '@supabase/supabase-js'
 
 const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
 
+async function update_user_quiz_answer(p_history_id, p_question_id, p_user_answer, p_user_id){
+    let { _, error } = await supabase
+    .rpc('update_user_quiz_answer', {
+      p_history_id, 
+      p_question_id, 
+      p_user_answer, 
+      p_user_id
+    })
+    if (error) console.error(error)
+}
 async function get_user_profile(user_id) {
     let { data, error } = await supabase
         .rpc('get_user_profile', {
@@ -35,8 +45,15 @@ async function increment_column_by_question_id(question_id, column) {
     if (error) throw new Error(`Failed to increment column: ${error.message}`)
     return data
 }
-function report_question(question_id) {
-    increment_column_by_question_id(question_id, 'times_flagged_bad');
+async function report_question(p_history_id, p_question_id, p_user_id) {    
+    let { data, error } = await supabase.rpc('report_low_quality_question', {
+                            p_history_id, 
+                            p_question_id, 
+                            p_user_id
+                            })
+    if (error) console.error(error)
+    console.log(data)
+    return data;
 }
 function report_answered_incorrectly(question_id) {
     increment_column_by_question_id(question_id, 'times_answered_incorrectly');
@@ -44,11 +61,12 @@ function report_answered_incorrectly(question_id) {
 function report_answered_correctly(question_id) {
     increment_column_by_question_id(question_id, 'times_answered_correctly');
 }
-function parseQuestionSet(question_set) {
-    const inputArray = question_set.questions
+function parseQuizData(quizData) {
+    const inputArray = quizData.question_set.questions
     return {
-        set_id: question_set.set_id,
-        jlpt_level: question_set.jlpt_level,
+        history_id: quizData.history_id,
+        set_id: quizData.question_set.set_id,
+        jlpt_level: quizData.question_set.jlpt_level,
         questions: inputArray.map((item, index) => ({
             id: item.question_id, // Use the original question_id instead of index
             question: item.question_japanese,
@@ -77,7 +95,7 @@ async function get_new_quiz(n, input_jlpt_level, user_id) {
             p_user_id: user_id
         })
     if (error) throw new Error(`Failed to select random questions: ${error.message}`)
-    return parseQuestionSet(data);
+    return parseQuizData(data);
 }
 
-export { get_user_profile, update_user_profile, increment_column_by_question_id, get_new_quiz, report_question, report_answered_incorrectly, report_answered_correctly, supabase };
+export { update_user_quiz_answer, get_user_profile, update_user_profile, increment_column_by_question_id, get_new_quiz, report_question, report_answered_incorrectly, report_answered_correctly, supabase };

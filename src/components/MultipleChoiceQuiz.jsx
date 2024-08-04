@@ -1,23 +1,30 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
-import { report_question, report_answered_incorrectly, report_answered_correctly } from '../db';
-
+import { report_question, report_answered_incorrectly, report_answered_correctly, update_user_quiz_answer } from '../db';
+import { AuthContext } from '../contexts/AuthContext';
 
 const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
+  console.log(quizData);
   const correctAnswers = quizData.questions.map(q => q.correctAnswer);
   const [selectedAnswers, setSelectedAnswers] = useState(
     Array(quizData.questions.length).fill(null)
   );
+  const history_id = quizData.history_id;
+  const set_id = quizData.set_id;
+  const questionIndexToId = quizData.questions.map(q => q.id);
+  const {user} = useContext(AuthContext);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [error, setError] = useState(null);
   const [reportedQuestions, setReportedQuestions] = useState([]);
   
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
+      console.log('questionIndex:', questionIndex)
       const newSelectedAnswers = [...selectedAnswers];
       newSelectedAnswers[questionIndex] = answer;
       setSelectedAnswers(newSelectedAnswers);
       setError(null);
+      update_user_quiz_answer(history_id, questionIndexToId[questionIndex], answer, user.id)
     }
   };
   const submitResult = () => {
@@ -57,10 +64,11 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
   };
 
   const handleReportQuestion = (questionId) => {
+    console.log('handleReportQuestion questionId: ', questionId)
     const questionIndex = quizData.questions.findIndex(q => q.id === questionId);
     if (questionIndex !== -1 && !reportedQuestions.includes(questionIndex)) {
       setReportedQuestions([...reportedQuestions, questionIndex]);
-      report_question(questionId);
+      report_question(history_id, questionId, user.id);
     }
   };
 

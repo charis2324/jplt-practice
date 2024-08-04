@@ -16,8 +16,8 @@ const QuizPage = () => {
   const fetchQuizData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const question_set = await get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id);
-      setQuizData(question_set);
+      const newQuizData = await get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id);
+      setQuizData(newQuizData);
       setError(null);
       setQuizStarted(true);
     } catch (e) {
