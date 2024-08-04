@@ -16,7 +16,7 @@ const QuestionInstruction = () => {
       </div>
 
       <div className="h-[400px] overflow-y-auto">
-        <div className="mb-4 text-gray-700 h-28">
+        <div className="mb-4 text-gray-700">
           {!showEnglish ? (
             <p>
               以下の文章の空欄に入る最も適切な言葉を選んでください。選択肢が辞書形（じしょけい）で示されている場合は、文脈に合わせて適切な活用形を考えてください。

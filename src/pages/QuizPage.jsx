@@ -53,14 +53,18 @@ const QuizPage = () => {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">JLPT Quiz</h1>
       {!quizStarted && (
-        <>
+        <div className='lg:flex lg:flex-row-reverse lg:items-center'>
+          <div className='lg:w-1/2'>
           <QuizConfigurator
             onConfigChange={handleConfigChange}
             currentConfig={quizConfig}
             onStart={handleStart}
           />
+          </div>
+          <div className='lg:w-1/2'>
           <QuestionInstruction />
-        </>
+          </div>
+        </div>
       )}
       {quizStarted && quizData ? (
         <MultipleChoiceQuiz
