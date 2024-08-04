@@ -80,7 +80,7 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
           <MultipleChoiceQuestion
             question_number={index}
             question_id={question.id}
-            question={question.question.japanese}
+            question={question.question}
             options={question.options}
             correctAnswer={question.correctAnswer}
             showCorrectAnswer={quizSubmitted || reportedQuestions.includes(index)}

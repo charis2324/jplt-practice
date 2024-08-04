@@ -1,8 +1,9 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext } from 'react';
 import MultipleChoiceQuiz from '../components/MultipleChoiceQuiz';
 import QuizConfigurator from '../components/QuizConfigurator';
 import QuestionInstruction from '../components/QuestionInstruction';
-import { get_random_quiz_data } from '../db';
+import { get_new_quiz } from '../db';
+import { AuthContext } from '../contexts/AuthContext';
 
 const QuizPage = () => {
   const [quizData, setQuizData] = useState(null);
@@ -10,12 +11,13 @@ const QuizPage = () => {
   const [error, setError] = useState(null);
   const [quizConfig, setQuizConfig] = useState({ questionCount: 10, jlptLevel: 5 });
   const [quizStarted, setQuizStarted] = useState(false);
+  const {user} = useContext(AuthContext);
 
   const fetchQuizData = useCallback(async () => {
     setIsLoading(true);
     try {
-      const data = await get_random_quiz_data(quizConfig.questionCount, quizConfig.jlptLevel);
-      setQuizData(data);
+      const question_set = await get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id);
+      setQuizData(question_set);
       setError(null);
       setQuizStarted(true);
     } catch (e) {
