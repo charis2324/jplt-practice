@@ -87,6 +87,7 @@ export const AuthProvider = ({ children }) => {
     register,
     fetchProfile,
     loading: userLoading || profileLoading,
+    hasUserAndProfile: !!user && !!profile  
   }
 
   // useEffect(()=>{console.log(user)}, [user])

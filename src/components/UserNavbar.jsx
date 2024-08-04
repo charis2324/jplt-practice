@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import UsernameInput from "./UsernameInput";
 
 function UserNavbar({ children }) {
-    const { profile, logout, loading } = useContext(AuthContext);
+    const { profile, logout, hasUserAndProfile } = useContext(AuthContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -48,7 +48,7 @@ function UserNavbar({ children }) {
                 </div>
             </nav>
             <main className="flex-grow container mx-auto p-4">
-                {!loading ? (
+                {hasUserAndProfile ? (
                     profile.username ? children : <UsernameInput />
                 ) : null}
             </main>
