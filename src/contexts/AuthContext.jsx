@@ -28,8 +28,8 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      const { data: { user:currentUser } } = await supabase.auth.getUser()
+      setUser(currentUser)
       setUserLoading(false)
     }
 
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        // console.log(event)
+        console.log(event)
         const currentUser = session?.user
         setUser(currentUser ?? null)
       }
@@ -57,17 +57,11 @@ export const AuthProvider = ({ children }) => {
       email,
       password,
     })
-    if (!error) {
-      setUser(data.user)
-    }
     return { data, error }
   }, [])
   
   const logout = useCallback(async () => {
     const { error } = await supabase.auth.signOut()
-    if (!error) {
-      setUser(null)
-    }
     return { error }  
   }, [])
 
@@ -90,8 +84,6 @@ export const AuthProvider = ({ children }) => {
     hasUserAndProfile: !!user && !!profile  
   }
 
-  // useEffect(()=>{console.log(user)}, [user])
-  // useEffect(()=>{console.log(profile)}, [profile])
   return (
     <AuthContext.Provider value={value}>
       {children}
