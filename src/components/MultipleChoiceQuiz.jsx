@@ -1,7 +1,9 @@
 import React, { useContext, useState } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
-import { report_question, report_answered_incorrectly, report_answered_correctly, update_user_quiz_answer } from '../db';
+import { report_question, report_answered_incorrectly, report_answered_correctly, update_user_quiz_answer, submit_user_quiz_answers } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
+
+
 
 const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
   console.log(quizData);
@@ -33,14 +35,26 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
     }
   };
   const submitResult = () => {
-    quizData.questions.forEach((question, index) => {
-      if (!reportedQuestions.includes(index)) {
-        const isCorrect = selectedAnswers[index] === correctAnswers[index];
-        const reportFunction = isCorrect ? report_answered_correctly : report_answered_incorrectly;
-        reportFunction(question.id);
-        console.log(index, isCorrect)
+    // quizData.questions.forEach((question, index) => {
+    //   if (!reportedQuestions.includes(index)) {
+    //     const isCorrect = selectedAnswers[index] === correctAnswers[index];
+    //     const reportFunction = isCorrect ? report_answered_correctly : report_answered_incorrectly;
+    //     reportFunction(question.id);
+    //     console.log(index, isCorrect)
+    //   }
+    // });
+    const submitQuestionState = quizData.questions.reduce((acc, q, index) => {
+      acc[q.id] = {
+        select_answer: selectedAnswers[index],
+        reported_low_quality: reportedQuestions.findIndex((qIndex) => qIndex == index) !== -1
       }
-    });
+      return acc;
+    }, {});
+    console.log('submitQuestionState: ', submitQuestionState)
+    const submitError = submit_user_quiz_answers(submitQuestionState, history_id, user.id);
+    if (submitError){
+      setError(error.message);
+    }
   }
   const handleSubmitQuiz = () => {
     const unansweredQuestions = selectedAnswers.reduce((acc, answer, index) => {
