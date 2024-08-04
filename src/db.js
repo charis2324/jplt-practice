@@ -55,6 +55,17 @@ async function report_question(p_history_id, p_question_id, p_user_id) {
     console.log(data)
     return data;
 }
+async function has_quiz_in_progress(p_user_id){
+    let { data, error } = await supabase
+    .rpc('get_latest_in_progress_history_id_for_user', {
+    p_user_id
+    })
+    if (error){
+        console.error(error);
+        return false;
+    } 
+    return !!data;
+}
 function report_answered_incorrectly(question_id) {
     increment_column_by_question_id(question_id, 'times_answered_incorrectly');
 }
@@ -77,7 +88,8 @@ function parseQuizData(quizData) {
                 D: item.option_d
             },
             correctAnswer: item.correct_answer
-        }))
+        })),
+        question_state: quizData.question_state
     };
 }
 
@@ -94,8 +106,16 @@ async function get_new_quiz(n, input_jlpt_level, user_id) {
             p_set_size: n,
             p_user_id: user_id
         })
-    if (error) throw new Error(`Failed to select random questions: ${error.message}`)
+    if (error) throw new Error(`Failed to fetch new quiz: ${error.message}`)
+    return parseQuizData(data);
+}
+async function get_in_progress_quiz(user_id){
+    let { data, error } = await supabase
+        .rpc('get_in_progress_quiz', {
+            p_user_id: user_id
+        })
+    if (error) throw new Error(`Failed to fetch in-progress quiz: ${error.message}`)
     return parseQuizData(data);
 }
 
-export { update_user_quiz_answer, get_user_profile, update_user_profile, increment_column_by_question_id, get_new_quiz, report_question, report_answered_incorrectly, report_answered_correctly, supabase };
+export { get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile, increment_column_by_question_id, get_new_quiz, report_question, report_answered_incorrectly, report_answered_correctly, supabase };

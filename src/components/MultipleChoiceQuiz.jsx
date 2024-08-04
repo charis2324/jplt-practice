@@ -7,16 +7,21 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
   console.log(quizData);
   const correctAnswers = quizData.questions.map(q => q.correctAnswer);
   const [selectedAnswers, setSelectedAnswers] = useState(
-    Array(quizData.questions.length).fill(null)
+    // Array(quizData.questions.length).fill(null)
+    quizData.questions.map(q => quizData.question_state[q.id.toString()].user_answer)
   );
   const history_id = quizData.history_id;
   const set_id = quizData.set_id;
   const questionIndexToId = quizData.questions.map(q => q.id);
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [error, setError] = useState(null);
-  const [reportedQuestions, setReportedQuestions] = useState([]);
-  
+  const [reportedQuestions, setReportedQuestions] = useState(Array.from({ length: quizData.questions.length }, (_, index) => index)
+    .filter(index => {
+      const questionId = quizData.questions[index].id.toString();
+      return quizData.question_state[questionId] && quizData.question_state[questionId].reported_low_quality;
+    }));
+
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
       console.log('questionIndex:', questionIndex)
