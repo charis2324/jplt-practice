@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import UsernameInput from "./UsernameInput";
+import IconImage from "../assets/icon.png"
 
 function UserNavbar({ children }) {
     const { profile, logout, hasUserAndProfile } = useContext(AuthContext);
@@ -22,8 +23,9 @@ function UserNavbar({ children }) {
             <nav className="bg-white shadow-md">
                 <div className="container md:flex md:justify-between mx-auto px-4 py-3">
                     <div className="flex justify-between items-center">
-                        <Link to="/dashboard" className="text-2xl font-bold text-blue-600 hover:text-blue-800 transition duration-300">
-                            JPLT Practice
+                        <Link to="/dashboard" className="flex items-center align-center gap-2">
+                            <img src={IconImage} alt="icon" className="h-10 w-10 object-contain" />
+                            <span className="text-2xl font-bold text-blue-600 hover:text-blue-800 transition duration-300">JPLT Practice</span>
                         </Link>
                         <button 
                             className="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none"
