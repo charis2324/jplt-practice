@@ -1,8 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useContext, useEffect } from 'react';
 import MultipleChoiceQuiz from '../components/MultipleChoiceQuiz';
 import QuizConfigurator from '../components/QuizConfigurator';
 import QuestionInstruction from '../components/QuestionInstruction';
-import { get_random_quiz_data } from '../db';
+import { get_new_quiz, get_in_progress_quiz,has_quiz_in_progress } from '../db';
+import { AuthContext } from '../contexts/AuthContext';
+import QuizContinue from '../components/QuizContinue';
 
 const QuizPage = () => {
   const [quizData, setQuizData] = useState(null);
@@ -10,13 +12,54 @@ const QuizPage = () => {
   const [error, setError] = useState(null);
   const [quizConfig, setQuizConfig] = useState({ questionCount: 10, jlptLevel: 5 });
   const [quizStarted, setQuizStarted] = useState(false);
-
-  const fetchQuizData = useCallback(async () => {
+  const [hasQuizInProgress, setHasQuizInProgress] = useState(true);
+  const [isContinue, setIsContinue] = useState(false);
+  const {user} = useContext(AuthContext);
+  const checkQuizProgress = useCallback(async (userId) => {
     setIsLoading(true);
+    const has_quiz = await has_quiz_in_progress(userId);
+    setIsLoading(false);
+    // console.log('has_quiz: ', has_quiz);
+    setHasQuizInProgress(has_quiz);
+    }, []);
+  useEffect(() => {
+    checkQuizProgress(user.id);
+}, [user.id]);
+
+  // const fetchQuizData = useCallback(async (is_new_quiz) => {
+  //   setIsLoading(true);
+  //   try {
+  //     const fetchedQuizData = null;
+  //     if(is_new_quiz){
+  //       fetchedQuizData = await get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id);
+  //     }
+  //     else{
+  //       fetchedQuizData = await get_in_progress_quiz(user.id);
+  //     }
+  //     setQuizData(fetchedQuizData);
+  //     setError(null);
+  //     setQuizStarted(true);
+  //   } catch (e) {
+  //     console.error('There was a problem fetching the quiz data:', e);
+  //     setError('Failed to load quiz data. Please try again later.');
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }, [quizConfig.questionCount, quizConfig.jlptLevel]);
+  const fetchQuizData = useCallback(async (is_new_quiz) => {
+    setIsLoading(true);
+    setError(null);
+  
     try {
-      const data = await get_random_quiz_data(quizConfig.questionCount, quizConfig.jlptLevel);
-      setQuizData(data);
-      setError(null);
+      const fetchedQuizData = await (is_new_quiz 
+        ? get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id)
+        : get_in_progress_quiz(user.id));
+  
+      if (!fetchedQuizData) {
+        throw new Error('No quiz data received');
+      }
+  
+      setQuizData(fetchedQuizData);
       setQuizStarted(true);
     } catch (e) {
       console.error('There was a problem fetching the quiz data:', e);
@@ -24,10 +67,10 @@ const QuizPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [quizConfig.questionCount, quizConfig.jlptLevel]);
+  }, [quizConfig.questionCount, quizConfig.jlptLevel, user.id]);
 
   const handleNextQuiz = useCallback(async () => {
-    await fetchQuizData();
+    await fetchQuizData(true);
     window.scrollTo(0, 0);
   }, [fetchQuizData]);
 
@@ -36,25 +79,38 @@ const QuizPage = () => {
   };
 
   const handleStart = () => {
+    setIsContinue(false);
     setQuizStarted(false);
     setQuizData(null);
-    fetchQuizData();
+    fetchQuizData(true);
   };
-
+  const handleContinue = () => {
+    setIsContinue(true);
+    setQuizStarted(false);
+    setQuizData(null);
+    fetchQuizData(false);
+  }
+  const handleExitQuiz = () => {
+    checkQuizProgress(user.id)
+    setQuizStarted(false);
+    setQuizData(null);
+  }
+  // useEffect(()=>{console.log('isContinue: ', isContinue)}, [isContinue])
   if (isLoading) {
-    return <div className="text-center mt-8">Loading quiz data...</div>;
+    return <div className="text-center mt-8">Loading...</div>;
   }
 
   if (error) {
     return <div className="text-center mt-8 text-red-600">{error}</div>;
   }
-
+  
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">JLPT Quiz</h1>
       {!quizStarted && (
         <div className='lg:flex lg:flex-row-reverse lg:items-center'>
           <div className='lg:w-1/2'>
+          {hasQuizInProgress && <QuizContinue onContinue={handleContinue}/>}
           <QuizConfigurator
             onConfigChange={handleConfigChange}
             currentConfig={quizConfig}
@@ -69,7 +125,9 @@ const QuizPage = () => {
       {quizStarted && quizData ? (
         <MultipleChoiceQuiz
           quizData={quizData}
+          isContinue={isContinue}
           onNextQuiz={handleNextQuiz}
+          onExitQuiz={handleExitQuiz}
         />
       ) : null}
     </div>
