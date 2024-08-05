@@ -1,12 +1,12 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
 import { report_question, report_answered_incorrectly, report_answered_correctly, update_user_quiz_answer, submit_user_quiz_answers } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
 
 
 
-const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
-  console.log(quizData);
+const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
+  // console.log(quizData);
   const correctAnswers = quizData.questions.map(q => q.correctAnswer);
   const [selectedAnswers, setSelectedAnswers] = useState(
     // Array(quizData.questions.length).fill(null)
@@ -26,7 +26,7 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
 
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
-      console.log('questionIndex:', questionIndex)
+      // console.log('questionIndex:', questionIndex)
       const newSelectedAnswers = [...selectedAnswers];
       newSelectedAnswers[questionIndex] = answer;
       setSelectedAnswers(newSelectedAnswers);
@@ -50,10 +50,10 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
       }
       return acc;
     }, {});
-    console.log('submitQuestionState: ', submitQuestionState)
+    // console.log('submitQuestionState: ', submitQuestionState)
     const submitError = submit_user_quiz_answers(submitQuestionState, history_id, user.id);
-    if (submitError){
-      setError(error.message);
+    if (submitError) {
+      setError(submitError.message);
     }
   }
   const handleSubmitQuiz = () => {
@@ -75,15 +75,15 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
     }
   };
 
-  const handleRestartQuiz = () => {
-    setQuizSubmitted(false);
-    setSelectedAnswers(Array(quizData.questions.length).fill(null));
-    setError(null);
-    setReportedQuestions([]);
-  };
+  // const handleRestartQuiz = () => {
+  //   setQuizSubmitted(false);
+  //   setSelectedAnswers(Array(quizData.questions.length).fill(null));
+  //   setError(null);
+  //   setReportedQuestions([]);
+  // };
 
   const handleReportQuestion = (questionId) => {
-    console.log('handleReportQuestion questionId: ', questionId)
+    // console.log('handleReportQuestion questionId: ', questionId)
     const questionIndex = quizData.questions.findIndex(q => q.id === questionId);
     if (questionIndex !== -1 && !reportedQuestions.includes(questionIndex)) {
       setReportedQuestions([...reportedQuestions, questionIndex]);
@@ -99,7 +99,7 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
   };
 
   const validQuestionCount = quizData.questions.length - reportedQuestions.length;
-
+  // useEffect(() => { console.log('isContinue: ', isContinue) }, [isContinue])
   return (
     <div className="container mx-auto p-4">
       {quizData.questions.map((question, index) => (
@@ -147,18 +147,25 @@ const MultipleChoiceQuiz = ({ quizData, onNextQuiz }) => {
           <p className="text-xl mb-4">
             Your score: {calculateScore()} / {validQuestionCount}
           </p>
-          <button
+          {/* <button
             onClick={handleRestartQuiz}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             Reset Quiz
-          </button>
+          </button> */}
           <button
-            onClick={() => onNextQuiz()}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            onClick={() => onExitQuiz()}
+            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
           >
-            Next Quiz
+            Exit Quiz
           </button>
+          {!isContinue &&
+            <button
+              onClick={() => onNextQuiz()}
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            >
+              Next Quiz
+            </button>}
         </div>
       )}
     </div>

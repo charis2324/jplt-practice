@@ -117,13 +117,13 @@ async function get_in_progress_quiz(user_id){
     if (error) throw new Error(`Failed to fetch in-progress quiz: ${error.message}`)
     return parseQuizData(data);
 }
-async function submit_user_quiz_answers(p_answers, p_history_id, p_user_id){
+async function submit_user_quiz_answers(quizState, historyId, userId){
     
-    let { _, error } = await supabase.rpc('submit_user_quiz_answers', {
-        p_answers, 
-        p_history_id, 
-        p_user_id
-    })
+    const { data, error } = await supabase.rpc('handle_quiz_submit', {
+        p_quiz_state: quizState,
+        p_history_id: historyId,
+        p_user_id: userId
+      });
     return error;
 }
 export { submit_user_quiz_answers, get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile, increment_column_by_question_id, get_new_quiz, report_question, report_answered_incorrectly, report_answered_correctly, supabase };

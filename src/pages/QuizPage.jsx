@@ -13,17 +13,17 @@ const QuizPage = () => {
   const [quizConfig, setQuizConfig] = useState({ questionCount: 10, jlptLevel: 5 });
   const [quizStarted, setQuizStarted] = useState(false);
   const [hasQuizInProgress, setHasQuizInProgress] = useState(true);
+  const [isContinue, setIsContinue] = useState(false);
   const {user} = useContext(AuthContext);
-
+  const checkQuizProgress = useCallback(async (userId) => {
+    setIsLoading(true);
+    const has_quiz = await has_quiz_in_progress(userId);
+    setIsLoading(false);
+    // console.log('has_quiz: ', has_quiz);
+    setHasQuizInProgress(has_quiz);
+    }, []);
   useEffect(() => {
-    const checkQuizProgress = async () => {
-        setIsLoading(true);
-        const has_quiz = await has_quiz_in_progress(user.id);
-        setIsLoading(false);
-        console.log('has_quiz: ', has_quiz);
-        setHasQuizInProgress(has_quiz);
-    };
-    checkQuizProgress();
+    checkQuizProgress(user.id);
 }, [user.id]);
 
   // const fetchQuizData = useCallback(async (is_new_quiz) => {
@@ -79,15 +79,23 @@ const QuizPage = () => {
   };
 
   const handleStart = () => {
+    setIsContinue(false);
     setQuizStarted(false);
     setQuizData(null);
     fetchQuizData(true);
   };
   const handleContinue = () => {
+    setIsContinue(true);
     setQuizStarted(false);
     setQuizData(null);
     fetchQuizData(false);
   }
+  const handleExitQuiz = () => {
+    checkQuizProgress(user.id)
+    setQuizStarted(false);
+    setQuizData(null);
+  }
+  // useEffect(()=>{console.log('isContinue: ', isContinue)}, [isContinue])
   if (isLoading) {
     return <div className="text-center mt-8">Loading...</div>;
   }
@@ -95,7 +103,7 @@ const QuizPage = () => {
   if (error) {
     return <div className="text-center mt-8 text-red-600">{error}</div>;
   }
-
+  
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">JLPT Quiz</h1>
@@ -117,7 +125,9 @@ const QuizPage = () => {
       {quizStarted && quizData ? (
         <MultipleChoiceQuiz
           quizData={quizData}
+          isContinue={isContinue}
           onNextQuiz={handleNextQuiz}
+          onExitQuiz={handleExitQuiz}
         />
       ) : null}
     </div>
