@@ -3,13 +3,13 @@ import { update_user_profile } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
 
 function UsernameInput() {
-  const [username, setUsername] = useState('');
+  const [displayName, setUsername] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const {user, fetchProfile} = useContext(AuthContext)
   const handleSubmit = async () => {
-    if (username.trim() !== '' && user.id) {
+    if (displayName.trim() !== '' && user.id) {
       const {data, error} = await update_user_profile({
-        username: username
+        display_name: displayName
       }, user.id);
       if(error){
         setErrorMessage(error.message)
@@ -27,7 +27,7 @@ function UsernameInput() {
         <div>
           <input
             type="text"
-            value={username}
+            value={displayName}
             onChange={(e) => setUsername(e.target.value)}
             placeholder="Username"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

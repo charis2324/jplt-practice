@@ -10,10 +10,13 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
   const correctAnswers = quizData.questions.map(q => q.correctAnswer);
   const [selectedAnswers, setSelectedAnswers] = useState(
     // Array(quizData.questions.length).fill(null)
-    quizData.questions.map(q => quizData.question_state[q.id.toString()].user_answer)
+    quizData.questions.map(q => {
+      const response = quizData.session_responses.find((qs) => qs.question_id == q.id)
+      return response.response_answer
+    })
   );
-  const history_id = quizData.history_id;
-  const set_id = quizData.set_id;
+  const session_id = quizData.session_id;
+  const quiz_id = quizData.quiz_id;
   const questionIndexToId = quizData.questions.map(q => q.id);
   const { user } = useContext(AuthContext);
   const [quizSubmitted, setQuizSubmitted] = useState(false);
@@ -21,9 +24,21 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
   const [reportedQuestions, setReportedQuestions] = useState(Array.from({ length: quizData.questions.length }, (_, index) => index)
     .filter(index => {
       const questionId = quizData.questions[index].id.toString();
-      return quizData.question_state[questionId] && quizData.question_state[questionId].reported_low_quality;
+      const qs = quizData.session_responses.find((qs) => qs.question_id == questionId);
+      return qs && qs.is_reported;
     }));
-
+  // useState(()=>{
+  //   console.log('session_id: ', session_id)
+  // }, [session_id])
+  // useState(()=>{
+  //   console.log('quiz_id', quiz_id)
+  // }, [quiz_id])
+  // useState(()=>{
+  //   console.log('selectedAnswers:', selectedAnswers)
+  // }, [selectedAnswers])
+  // useState(()=>{
+  //   console.log('reportedQuestions:', reportedQuestions)
+  // }, [reportedQuestions])
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
       // console.log('questionIndex:', questionIndex)
@@ -31,7 +46,7 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
       newSelectedAnswers[questionIndex] = answer;
       setSelectedAnswers(newSelectedAnswers);
       setError(null);
-      update_user_quiz_answer(history_id, questionIndexToId[questionIndex], answer, user.id)
+      update_user_quiz_answer(questionIndexToId[questionIndex], session_id, answer)
     }
   };
   const submitResult = () => {
@@ -43,18 +58,34 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
     //     console.log(index, isCorrect)
     //   }
     // });
-    const submitQuestionState = quizData.questions.reduce((acc, q, index) => {
-      acc[q.id] = {
-        select_answer: selectedAnswers[index],
-        reported_low_quality: reportedQuestions.findIndex((qIndex) => qIndex == index) !== -1
+    // const submitQuestionState = quizData.questions.reduce((acc, q, index) => {
+    //   acc[q.id] = {
+    //     select_answer: selectedAnswers[index],
+    //     reported_low_quality: reportedQuestions.findIndex((qIndex) => qIndex == index) !== -1
+    //   }
+    //   return acc;
+    // }, {});
+
+    const finalSessionResponses = quizData.questions.map((q, index) => {
+      return {
+        question_id: q.id,
+        response_answer: selectedAnswers[index],
+        is_reported: reportedQuestions.findIndex((qIndex) => qIndex == index) !== -1
       }
-      return acc;
-    }, {});
+    })
+
     // console.log('submitQuestionState: ', submitQuestionState)
-    const submitError = submit_user_quiz_answers(submitQuestionState, history_id, user.id);
-    if (submitError) {
-      setError(submitError.message);
+    try {
+      const submitedQuizSessionResponses = submit_user_quiz_answers(session_id, {
+        session_responses: finalSessionResponses
+      });
+    }catch (e) {
+      console.log('Catching error:', e);
+      setError(e.message);
     }
+    // if (submitError) {
+    //   setError(submitError.message);
+    // }
   }
   const handleSubmitQuiz = () => {
     const unansweredQuestions = selectedAnswers.reduce((acc, answer, index) => {
@@ -87,7 +118,7 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
     const questionIndex = quizData.questions.findIndex(q => q.id === questionId);
     if (questionIndex !== -1 && !reportedQuestions.includes(questionIndex)) {
       setReportedQuestions([...reportedQuestions, questionIndex]);
-      report_question(history_id, questionId, user.id);
+      report_question(session_id, questionId);
     }
   };
 

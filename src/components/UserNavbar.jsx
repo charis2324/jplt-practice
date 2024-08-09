@@ -37,7 +37,7 @@ function UserNavbar({ children }) {
                         </button>
                     </div>
                     <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row md:items-center md:space-x-6 mt-4 md:mt-0`}>
-                        <span className="text-gray-600 font-medium py-2 md:py-0">{`Welcome, ${profile?.username ?? ''}`}</span>
+                        <span className="text-gray-600 font-medium py-2 md:py-0">{`Welcome, ${profile?.display_name ?? ''}`}</span>
                         <Link to="/quiz" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">Quiz</Link>
                         <Link to="/profile" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">Profile</Link>
                         <button
@@ -51,7 +51,7 @@ function UserNavbar({ children }) {
             </nav>
             <main className="flex-grow container mx-auto p-4">
                 {hasUserAndProfile ? (
-                    profile.username ? children : <UsernameInput />
+                    profile.display_name ? children : <UsernameInput />
                 ) : null}
             </main>
             <footer className="bg-gray-200 p-4 text-center">
