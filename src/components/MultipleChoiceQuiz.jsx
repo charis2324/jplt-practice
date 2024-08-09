@@ -58,18 +58,34 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
     //     console.log(index, isCorrect)
     //   }
     // });
-    const submitQuestionState = quizData.questions.reduce((acc, q, index) => {
-      acc[q.id] = {
-        select_answer: selectedAnswers[index],
-        reported_low_quality: reportedQuestions.findIndex((qIndex) => qIndex == index) !== -1
+    // const submitQuestionState = quizData.questions.reduce((acc, q, index) => {
+    //   acc[q.id] = {
+    //     select_answer: selectedAnswers[index],
+    //     reported_low_quality: reportedQuestions.findIndex((qIndex) => qIndex == index) !== -1
+    //   }
+    //   return acc;
+    // }, {});
+
+    const finalSessionResponses = quizData.questions.map((q, index) => {
+      return {
+        question_id: q.id,
+        response_answer: selectedAnswers[index],
+        is_reported: reportedQuestions.findIndex((qIndex) => qIndex == index) !== -1
       }
-      return acc;
-    }, {});
+    })
+
     // console.log('submitQuestionState: ', submitQuestionState)
-    const submitError = submit_user_quiz_answers(submitQuestionState, session_id, user.id);
-    if (submitError) {
-      setError(submitError.message);
+    try {
+      const submitedQuizSessionResponses = submit_user_quiz_answers(session_id, {
+        session_responses: finalSessionResponses
+      });
+    }catch (e) {
+      console.log('Catching error:', e);
+      setError(e.message);
     }
+    // if (submitError) {
+    //   setError(submitError.message);
+    // }
   }
   const handleSubmitQuiz = () => {
     const unansweredQuestions = selectedAnswers.reduce((acc, answer, index) => {
