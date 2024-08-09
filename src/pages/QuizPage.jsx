@@ -54,7 +54,7 @@ const QuizPage = () => {
       const fetchedQuizData = await (is_new_quiz 
         ? get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id)
         : get_in_progress_quiz(user.id));
-      console.log(fetchedQuizData);  
+      // console.log(fetchedQuizData);  
       if (!fetchedQuizData) {
         throw new Error('No quiz data received');
       }

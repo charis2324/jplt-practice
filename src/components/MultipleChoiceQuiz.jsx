@@ -27,18 +27,18 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
       const qs = quizData.session_responses.find((qs) => qs.question_id == questionId);
       return qs && qs.is_reported;
     }));
-  useState(()=>{
-    console.log('session_id: ', session_id)
-  }, [session_id])
-  useState(()=>{
-    console.log('quiz_id', quiz_id)
-  }, [quiz_id])
-  useState(()=>{
-    console.log('selectedAnswers:', selectedAnswers)
-  }, [selectedAnswers])
-  useState(()=>{
-    console.log('reportedQuestions:', reportedQuestions)
-  }, [reportedQuestions])
+  // useState(()=>{
+  //   console.log('session_id: ', session_id)
+  // }, [session_id])
+  // useState(()=>{
+  //   console.log('quiz_id', quiz_id)
+  // }, [quiz_id])
+  // useState(()=>{
+  //   console.log('selectedAnswers:', selectedAnswers)
+  // }, [selectedAnswers])
+  // useState(()=>{
+  //   console.log('reportedQuestions:', reportedQuestions)
+  // }, [reportedQuestions])
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
       // console.log('questionIndex:', questionIndex)
