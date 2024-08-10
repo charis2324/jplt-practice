@@ -19,33 +19,11 @@ const QuizPage = () => {
     setIsLoading(true);
     const has_quiz = await has_quiz_in_progress(userId);
     setIsLoading(false);
-    // console.log('has_quiz: ', has_quiz);
     setHasQuizInProgress(has_quiz);
     }, []);
   useEffect(() => {
     checkQuizProgress(user.id);
 }, [user.id]);
-
-  // const fetchQuizData = useCallback(async (is_new_quiz) => {
-  //   setIsLoading(true);
-  //   try {
-  //     const fetchedQuizData = null;
-  //     if(is_new_quiz){
-  //       fetchedQuizData = await get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id);
-  //     }
-  //     else{
-  //       fetchedQuizData = await get_in_progress_quiz(user.id);
-  //     }
-  //     setQuizData(fetchedQuizData);
-  //     setError(null);
-  //     setQuizStarted(true);
-  //   } catch (e) {
-  //     console.error('There was a problem fetching the quiz data:', e);
-  //     setError('Failed to load quiz data. Please try again later.');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, [quizConfig.questionCount, quizConfig.jlptLevel]);
   const fetchQuizData = useCallback(async (is_new_quiz) => {
     setIsLoading(true);
     setError(null);
@@ -54,7 +32,6 @@ const QuizPage = () => {
       const fetchedQuizData = await (is_new_quiz 
         ? get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id)
         : get_in_progress_quiz(user.id));
-      // console.log(fetchedQuizData);  
       if (!fetchedQuizData) {
         throw new Error('No quiz data received');
       }
@@ -95,7 +72,6 @@ const QuizPage = () => {
     setQuizStarted(false);
     setQuizData(null);
   }
-  // useEffect(()=>{console.log('isContinue: ', isContinue)}, [isContinue])
   if (isLoading) {
     return <div className="text-center mt-8">Loading...</div>;
   }
