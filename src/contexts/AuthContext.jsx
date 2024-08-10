@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase, get_user_profile } from '../db'
-import debounce from 'lodash.debounce'
+import debounce from 'lodash/debounce'
 
 export const AuthContext = createContext()
 
@@ -101,6 +101,10 @@ export const AuthProvider = ({ children }) => {
   const refreshProfile = useCallback(async () => {
     if (user) {
       const updatedProfile = await fetchProfile(user.id)
+      if (updatedProfile) {
+        setProfile(updatedProfile)
+        localStorage.setItem(LOCALSTORAGE_PROFILE_KEY, JSON.stringify(updatedProfile))
+      }
       return updatedProfile
     }
     return null
