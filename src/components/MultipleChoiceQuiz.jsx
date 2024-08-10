@@ -26,18 +26,18 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
     })
   )
 
-  useEffect(()=>{
-    console.log('session_id: ', session_id)
-  }, [session_id])
-  useEffect(()=>{
-    console.log('quiz_id', quiz_id)
-  }, [quiz_id])
-  useEffect(()=>{
-    console.log('selectedAnswers:', selectedAnswers)
-  }, [selectedAnswers])
-  useEffect(()=>{
-    console.log('reportedQuestions:', reportedQuestions)
-  }, [reportedQuestions])
+  // useEffect(() => {
+  //   console.log('session_id: ', session_id)
+  // }, [session_id])
+  // useEffect(() => {
+  //   console.log('quiz_id', quiz_id)
+  // }, [quiz_id])
+  // useEffect(() => {
+  //   console.log('selectedAnswers:', selectedAnswers)
+  // }, [selectedAnswers])
+  // useEffect(() => {
+  //   console.log('reportedQuestions:', reportedQuestions)
+  // }, [reportedQuestions])
 
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
@@ -61,7 +61,7 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
       const submitedQuizSessionResponses = submit_user_quiz_answers(session_id, {
         session_responses: finalSessionResponses
       });
-    }catch (e) {
+    } catch (e) {
       console.log('Catching error:', e);
       setError(e.message);
     }
@@ -100,7 +100,7 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
     }, 0);
   };
 
-  const validQuestionCount = quizData.questions.length - reportedQuestions.reduce((sum, rq) => {return rq ? sum + 1 : sum}, 0);
+  const validQuestionCount = quizData.questions.length - reportedQuestions.reduce((sum, rq) => { return rq ? sum + 1 : sum }, 0);
   return (
     <div className="container mx-auto p-4">
       {quizData.questions.map((question, index) => (
@@ -136,12 +136,20 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
       )}
 
       {!quizSubmitted ? (
-        <button
-          onClick={handleSubmitQuiz}
-          className="mt-8 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-        >
-          Submit Quiz
-        </button>
+        <div className="mt-8 text-center space-x-3">
+          <button
+            onClick={handleSubmitQuiz}
+            className="w-32 mt-8 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Submit Quiz
+          </button>
+          <button
+            onClick={() => onExitQuiz()}
+            className="w-32 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Exit Quiz
+          </button>
+        </div>
       ) : (
         <div className="mt-8 text-center space-x-3">
           <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
