@@ -18,6 +18,7 @@ const QuizPage = () => {
   const checkQuizProgress = useCallback(async (userId) => {
     setIsLoading(true);
     const has_quiz = await has_quiz_in_progress(userId);
+    console.log(has_quiz)
     setIsLoading(false);
     setHasQuizInProgress(has_quiz);
     }, []);
