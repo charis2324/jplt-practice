@@ -5,7 +5,7 @@ import { AuthContext } from '../contexts/AuthContext';
 function UsernameInput() {
   const [displayName, setUsername] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const {user, fetchProfile} = useContext(AuthContext)
+  const {user, refreshProfile} = useContext(AuthContext)
   const handleSubmit = async () => {
     if (displayName.trim() !== '' && user.id) {
       const {data, error} = await update_user_profile({
@@ -14,7 +14,7 @@ function UsernameInput() {
       if(error){
         setErrorMessage(error.message)
       }else{
-        await fetchProfile()
+        await refreshProfile()
       }
     }else{
       setErrorMessage("Username cannot be empty")
