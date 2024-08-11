@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react'
 import { supabase, get_user_profile } from '../db'
-import debounce from 'lodash/debounce'
+import debounce from 'lodash.debounce'
 
 export const AuthContext = createContext()
 
