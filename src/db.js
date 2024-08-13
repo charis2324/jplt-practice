@@ -35,15 +35,6 @@ async function update_user_profile(p_profile_data, p_user_id) {
     }
     return { data, error }
 }
-async function increment_column_by_question_id(question_id, column) {
-    const { data, error } = await supabase
-        .rpc('increment_column_by_question_id', {
-            p_column: column,
-            p_question_id: question_id
-        })
-    if (error) throw new Error(`Failed to increment column: ${error.message}`)
-    return data
-}
 async function report_question(p_quiz_session_id, p_question_id) {
     let { data, error } = await supabase.rpc('report_quiz_session_question', {
         p_question_id,
@@ -63,12 +54,6 @@ async function has_quiz_in_progress(p_user_id) {
         return false;
     }
     return !!data;
-}
-function report_answered_incorrectly(question_id) {
-    increment_column_by_question_id(question_id, 'times_answered_incorrectly');
-}
-function report_answered_correctly(question_id) {
-    increment_column_by_question_id(question_id, 'times_answered_correctly');
 }
 function parseQuizData(quizData) {
     const inputArray = quizData.quiz_details
@@ -124,4 +109,13 @@ async function submit_user_quiz_answers(p_quiz_session_id, p_session_responses) 
     if (error) throw new Error(`Failed to submit quiz: ${error.message}`)
     return data;
 }
-export { submit_user_quiz_answers, get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile, increment_column_by_question_id, get_new_quiz, report_question, report_answered_incorrectly, report_answered_correctly, supabase };
+async function update_quiz_session_responses(p_quiz_session_id, p_session_responses) {
+    let { data, error } = await supabase
+        .rpc('update_quiz_session_responses', {
+            p_quiz_session_id,
+            p_session_responses
+        })
+    if (error) throw new Error(`Failed to submit quiz: ${error.message}`)
+    return data
+}
+export { update_quiz_session_responses, submit_user_quiz_answers, get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile,  get_new_quiz, report_question, supabase };

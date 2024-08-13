@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
-import { report_question, update_user_quiz_answer, submit_user_quiz_answers } from '../db';
+import { report_question, update_user_quiz_answer, submit_user_quiz_answers, update_quiz_session_responses } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
-
+import debounce from 'lodash.debounce';
 
 
 const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
@@ -25,7 +25,36 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
       return response.is_reported
     })
   )
-
+  const getFullSessionResponses = (currentAnswers, currentReportedQuestions) => {
+    return {
+      session_responses: quizData.questions.map((q, index) => {
+        return {
+          question_id: q.id,
+          response_answer: currentAnswers[index],
+          is_reported: currentReportedQuestions[index]
+        }
+      })
+    } 
+  }
+  const updateSessionResponses = async (newAnswers, newReportedQuestions) => {
+    const fullSessionResponses = getFullSessionResponses(newAnswers, newReportedQuestions);
+    console.log(fullSessionResponses);
+    try {
+      await update_quiz_session_responses(session_id, fullSessionResponses);
+    } catch (error) {
+      console.error('Failed to update session responses:', error);
+      // Optionally set an error state or show a notification to the user
+    }
+  }
+  const debouncedUpdateSessionResponses = useCallback(
+    debounce((newAnswers, newReportedQuestions) => {
+      updateSessionResponses(newAnswers, newReportedQuestions).catch(error => {
+        console.error('Error in debounced update:', error);
+        // Optionally set an error state or show a notification to the user
+      });
+    }, 1000),
+    [session_id] // Dependencies array
+  );
   // useEffect(() => {
   //   console.log('session_id: ', session_id)
   // }, [session_id])
@@ -38,29 +67,20 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
   // useEffect(() => {
   //   console.log('reportedQuestions:', reportedQuestions)
   // }, [reportedQuestions])
-
   const handleAnswerSelect = (questionIndex, answer) => {
     if (!quizSubmitted) {
-      console.log('questionIndex:', questionIndex)
-      const newSelectedAnswers = [...selectedAnswers];
-      newSelectedAnswers[questionIndex] = answer;
-      setSelectedAnswers(newSelectedAnswers);
+      setSelectedAnswers((prevAnswers)=> {
+        const newAnswers = [...prevAnswers];
+        newAnswers[questionIndex] = answer;
+        debouncedUpdateSessionResponses(newAnswers, reportedQuestions);
+        return newAnswers;
+      })
       setError(null);
-      update_user_quiz_answer(questionIndexToId[questionIndex], session_id, answer)
     }
-  };
+  }
   const submitResult = () => {
-    const finalSessionResponses = quizData.questions.map((q, index) => {
-      return {
-        question_id: q.id,
-        response_answer: selectedAnswers[index],
-        is_reported: reportedQuestions[index]
-      }
-    })
     try {
-      const submitedQuizSessionResponses = submit_user_quiz_answers(session_id, {
-        session_responses: finalSessionResponses
-      });
+      const submittedQuizSessionResponses = submit_user_quiz_answers(session_id, getFullSessionResponses(selectedAnswers, reportedQuestions));
     } catch (e) {
       console.log('Catching error:', e);
       setError(e.message);
@@ -85,11 +105,13 @@ const MultipleChoiceQuiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) =>
     }
   };
   const handleReportQuestion = (questionIndex) => {
-    const newReportedQuestions = [...reportedQuestions]
-    newReportedQuestions[questionIndex] = true;
-    setReportedQuestions(newReportedQuestions);
-    setError(null)
-    report_question(session_id, questionIndexToId[questionIndex]);
+    setReportedQuestions((prevReported )=> {
+      const newReported = [...prevReported]
+      newReported[questionIndex] =  true;
+      debouncedUpdateSessionResponses(selectedAnswers, newReported);
+      return newReported;
+    })
+    setError(null);
     console.log('handleReportQuestion questionId: ', questionIndexToId[questionIndex])
   }
 
