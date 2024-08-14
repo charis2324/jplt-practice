@@ -24,6 +24,17 @@ async function get_user_profile(p_user_id) {
         return data
     }
 }
+async function get_user_stats(){
+    let { data, error } = await supabase
+  .rpc('get_user_stats')
+    if (error) {
+        console.error(error)
+        return null;
+    }
+    else {
+        return data;
+    }
+}
 async function update_user_profile(p_profile_data, p_user_id) {
     let { data, error } = await supabase
         .rpc('update_user_profile', {
@@ -118,4 +129,4 @@ async function update_quiz_session_responses(p_quiz_session_id, p_session_respon
     if (error) throw new Error(`Failed to submit quiz: ${error.message}`)
     return data
 }
-export { update_quiz_session_responses, submit_user_quiz_answers, get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile,  get_new_quiz, report_question, supabase };
+export { get_user_stats, update_quiz_session_responses, submit_user_quiz_answers, get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile,  get_new_quiz, report_question, supabase };
