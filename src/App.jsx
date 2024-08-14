@@ -4,6 +4,8 @@ import { AuthContext, AuthProvider } from './contexts/AuthContext';
 import UserNavbar from './components/UserNavbar';
 import AuthPage from './pages/AuthPage';
 import QuizPage from './pages/QuizPage';
+import DashboardPage from './pages/DashboardPage';
+
 
 const PrivateRoute = ({children }) => {
   const {user} = useContext(AuthContext)
