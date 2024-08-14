@@ -9,14 +9,46 @@ const Dashboard = ({ userStats, isLoading }) => {
     };
 
     const stats = React.useMemo(() => [
-        { title: "Total Questions", value: userStats?.total_questions, description: "Engagement metric" },
-        { title: "Correct Answers", value: userStats?.correct_answers, description: "Accuracy measure" },
-        { title: "Accuracy %", value: userStats?.accuracy_percentage ? `${userStats.accuracy_percentage}%` : null, description: "Overall performance" },
-        { title: "Quizzes Completed", value: userStats?.quizzes_completed, description: "Consistency tracker" },
-        { title: "Avg. JLPT Level", value: userStats?.average_jlpt_level ? `N${userStats.average_jlpt_level}` : null, description: "Proficiency indicator" },
-        { title: "Avg. Answer Time", value: userStats?.average_answer_second ? `${userStats.average_answer_second}s` : null, description: "Speed metric" },
-        { title: "Current Streak", value: formatDays(userStats?.current_streak), description: "Daily engagement" },
-        { title: "Best Streak", value: formatDays(userStats?.highest_streak), description: "Personal record" },
+        { 
+            title: "Total Questions", 
+            value: userStats?.total_questions, 
+            description: "Your journey in numbers" 
+        },
+        { 
+            title: "Correct Answers", 
+            value: userStats?.correct_answers, 
+            description: "Your triumphs" 
+        },
+        { 
+            title: "Accuracy %", 
+            value: userStats?.accuracy_percentage ? `${userStats.accuracy_percentage}%` : null, 
+            description: "Your precision" 
+        },
+        { 
+            title: "Quizzes Completed", 
+            value: userStats?.quizzes_completed, 
+            description: "Milestones achieved" 
+        },
+        { 
+            title: "Avg. JLPT Level", 
+            value: userStats?.average_jlpt_level ? `N${userStats.average_jlpt_level}` : null, 
+            description: "Your current challenge" 
+        },
+        { 
+            title: "Avg. Answer Time", 
+            value: userStats?.average_answer_second ? `${userStats.average_answer_second}s` : null, 
+            description: "Your swiftness" 
+        },
+        { 
+            title: "Current Streak", 
+            value: formatDays(userStats?.current_streak), 
+            description: "Your momentum" 
+        },
+        { 
+            title: "Best Streak", 
+            value: formatDays(userStats?.highest_streak), 
+            description: "Your personal best" 
+        },
     ], [userStats]);
 
     if (isLoading) {
