@@ -10,9 +10,19 @@ const Dashboard = ({ userStats, isLoading }) => {
 
     const stats = React.useMemo(() => [
         { 
+            title: "Quizzes Completed", 
+            value: userStats?.quizzes_completed, 
+            description: "Milestones achieved" 
+        },
+        { 
             title: "Total Questions", 
             value: userStats?.total_questions, 
             description: "Your journey in numbers" 
+        },
+        { 
+            title: "Distinct Questions", 
+            value: userStats?.total_distinct_questions, 
+            description: "Variety in your learning" 
         },
         { 
             title: "Correct Answers", 
@@ -25,14 +35,9 @@ const Dashboard = ({ userStats, isLoading }) => {
             description: "Your precision" 
         },
         { 
-            title: "Quizzes Completed", 
-            value: userStats?.quizzes_completed, 
-            description: "Milestones achieved" 
-        },
-        { 
-            title: "Avg. JLPT Level", 
-            value: userStats?.average_jlpt_level ? `N${userStats.average_jlpt_level}` : null, 
-            description: "Your current challenge" 
+            title: "First Try Success %", 
+            value: userStats?.first_try_success_percentage ? `${userStats.first_try_success_percentage}%` : null, 
+            description: "Your initial accuracy" 
         },
         { 
             title: "Avg. Answer Time", 
@@ -49,6 +54,11 @@ const Dashboard = ({ userStats, isLoading }) => {
             value: formatDays(userStats?.highest_streak), 
             description: "Your personal best" 
         },
+        { 
+            title: "Avg. JLPT Level", 
+            value: userStats?.average_jlpt_level ? `N${userStats.average_jlpt_level.toFixed(2)}` : null, 
+            description: "Your current challenge" 
+        }
     ], [userStats]);
 
     if (isLoading) {
@@ -64,6 +74,7 @@ const Dashboard = ({ userStats, isLoading }) => {
     return (
         <div className="p-6">
             <div className="max-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold mb-6 text-center">Dashboard</h1>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                     {stats.map((stat) => (
                         <StatsCard key={stat.title} {...stat} />
