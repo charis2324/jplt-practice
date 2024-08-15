@@ -10,6 +10,9 @@ const MultipleChoiceQuestion = ({
   selectedOption,
   onOptionSelect,
   onReportQuestion,
+  showReportBtn = true,
+  showShadow = true,
+  useSpacing = true
 }) => {
   const getOptionClass = (optionKey) => {
     if (!showCorrectAnswer) {
@@ -28,17 +31,17 @@ const MultipleChoiceQuestion = ({
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 mb-6">
+    <div className={`bg-white rounded-lg ${useSpacing ? 'p-6 mb-6' : ''} ${showShadow ? 'shadow-md' : ''}`}>
       <div className="mb-2 flex justify-between items-start">
         <div>
-          <span className="font-bold text-lg text-blue-600">Q {question_number + 1}:</span>
+          {!isNaN(question_number) && <span className="font-bold text-lg text-blue-600">Q {question_number + 1}:</span>}
         </div>
-        <button
+        {showReportBtn && <button
           onClick={() => onReportQuestion(question_id)}
           className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors text-sm font-medium"
         >
           Report Low Quality
-        </button>
+        </button>}
       </div>
       <p className="mb-4 text-gray-800">{question}</p>
       <div className="space-y-2">
