@@ -16,7 +16,8 @@ const Dashboard = ({ userStats, isLoading }) => {
                 C: q.option_c,
                 D: q.option_d
             },
-            correctAnswer: q.correct_answer
+            correctAnswer: q.correct_answer,
+            selectedOption: q.response_answer
         };
     };
 
@@ -83,13 +84,20 @@ const Dashboard = ({ userStats, isLoading }) => {
 
     const questionStats = useMemo(() => {
         const mostIncorrectQuestion = userStats?.most_incorrect_question;
+        const lastest_random_active_incorrect_question = userStats?.lastest_random_active_incorrect_question
         return mostIncorrectQuestion ? [
+            {
+                title: 'Recent Error',
+                value: null,
+                questionDetails: parseQuestionDetails(lastest_random_active_incorrect_question),
+                isNegative: true
+            },
             {
                 title: 'Most Frequent Error',
                 value: formatTimes(userStats.most_incorrect_question_incorrect_count),
                 questionDetails: parseQuestionDetails(mostIncorrectQuestion),
                 isNegative: true
-            }
+            },
         ] : [];
     }, [userStats]);
 
