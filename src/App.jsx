@@ -5,7 +5,7 @@ import UserNavbar from './components/UserNavbar';
 import AuthPage from './pages/AuthPage';
 import QuizPage from './pages/QuizPage';
 import DashboardPage from './pages/DashboardPage';
-
+import QuizHistoryPage from './pages/QuizHistoryPage';
 
 const PrivateRoute = ({children }) => {
   const {user} = useContext(AuthContext)
@@ -24,6 +24,10 @@ const router = createHashRouter([
   {
     path: "dashboard",
     element: (<PrivateRoute><UserNavbar><DashboardPage/></UserNavbar></PrivateRoute>)
+  },
+  {
+    path: "history",
+    element: (<PrivateRoute><UserNavbar><QuizHistoryPage/></UserNavbar></PrivateRoute>)
   },
   {
     path: "*",

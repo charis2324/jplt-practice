@@ -40,6 +40,7 @@ function UserNavbar({ children }) {
                         <span className="text-gray-600 font-medium py-2 md:py-0">{`Welcome, ${profile?.display_name ?? ''}`}</span>
                         <Link to="/quiz" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">Quiz</Link>
                         <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">Dashboard</Link>
+                        <Link to="/history" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">History</Link>
                         <button
                             onClick={handleLogout}
                             className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full transition duration-300 transform hover:scale-105 mt-2 md:mt-0"
