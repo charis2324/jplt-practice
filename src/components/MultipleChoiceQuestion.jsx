@@ -14,13 +14,16 @@ const MultipleChoiceQuestion = ({
   showShadow = true,
   useSpacing = true
 }) => {
+  // Determine the CSS classes for each option based on the state
   const getOptionClass = (optionKey) => {
     if (!showCorrectAnswer) {
+      // Before showing correct answers
       return selectedOption === optionKey
         ? 'bg-blue-100 border-blue-500'
         : 'bg-gray-100 hover:bg-gray-200';
     }
 
+    // After showing correct answers
     if (optionKey === correctAnswer) {
       return 'bg-green-100 border-green-500';
     }
@@ -34,14 +37,18 @@ const MultipleChoiceQuestion = ({
     <div className={`bg-white rounded-lg ${useSpacing ? 'p-6 mb-6' : ''} ${showShadow ? 'shadow-md' : ''}`}>
       <div className="mb-2 flex justify-between items-start">
         <div>
-          {!isNaN(question_number) && <span className="font-bold text-lg text-blue-600">Q {question_number + 1}:</span>}
+          {!isNaN(question_number) && (
+            <span className="font-bold text-lg text-blue-600">Q {question_number + 1}:</span>
+          )}
         </div>
-        {showReportBtn && <button
-          onClick={() => onReportQuestion(question_id)}
-          className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors text-sm font-medium"
-        >
-          Report Low Quality
-        </button>}
+        {showReportBtn && (
+          <button
+            onClick={() => onReportQuestion(question_id)}
+            className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors text-sm font-medium"
+          >
+            Report Low Quality
+          </button>
+        )}
       </div>
       <p className="mb-4 text-gray-800">{question}</p>
       <div className="space-y-2">
@@ -65,9 +72,7 @@ const MultipleChoiceQuestion = ({
               {key}. {value}
             </span>
             {showCorrectAnswer && key === correctAnswer && (
-              <span className="ml-2 text-green-600 font-bold">
-                (Correct Answer)
-              </span>
+              <span className="ml-2 text-green-600 font-bold">(Correct Answer)</span>
             )}
           </label>
         ))}
