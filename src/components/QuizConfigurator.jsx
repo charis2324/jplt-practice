@@ -1,9 +1,9 @@
 import React from 'react';
 
 const QuizConfigurator = ({ onConfigChange, currentConfig, onStart }) => {
-  const options = [5, 10, 50];
+  const options = [5, 10, 30, 50];
   const handleJLPTLevelCHange = (e) => {
-    onConfigChange({...currentConfig, jlptLevel: Number(e.target.value)})
+    onConfigChange({ ...currentConfig, jlptLevel: Number(e.target.value) })
   }
 
   return (
@@ -28,9 +28,9 @@ const QuizConfigurator = ({ onConfigChange, currentConfig, onStart }) => {
         <legend className="block mb-2 font-bold">JLPT Level:</legend>
         <div className="w-full p-2 rounded mb-4 space-x-2">
           <label htmlFor="JLPTN5">N5</label>
-          <input type="radio" name="JLPTLevel" id="JLPTN5" value="5" checked={currentConfig.jlptLevel === 5 } onChange={handleJLPTLevelCHange}/>
+          <input type="radio" name="JLPTLevel" id="JLPTN5" value="5" checked={currentConfig.jlptLevel === 5} onChange={handleJLPTLevelCHange} />
           <label htmlFor="JLPTN4">N4</label>
-          <input type="radio" name="JLPTLevel" id="JLPTN4" value="4" checked={currentConfig.jlptLevel === 4 } onChange={handleJLPTLevelCHange}/>
+          <input type="radio" name="JLPTLevel" id="JLPTN4" value="4" checked={currentConfig.jlptLevel === 4} onChange={handleJLPTLevelCHange} />
         </div>
       </fieldset>
       <button
