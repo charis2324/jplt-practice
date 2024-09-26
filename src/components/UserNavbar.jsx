@@ -3,6 +3,7 @@ import { AuthContext } from "../contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
 import UsernameInput from "./UsernameInput";
 import IconImage from "../assets/icon.png"
+import Banner from "./Banner";
 
 function UserNavbar({ children }) {
     const { profile, logout, hasUserAndProfile } = useContext(AuthContext);
@@ -50,6 +51,7 @@ function UserNavbar({ children }) {
                     </div>
                 </div>
             </nav>
+            <Banner />
             <main className="flex-grow container mx-auto p-4">
                 {hasUserAndProfile ? (
                     profile.display_name ? children : <UsernameInput />

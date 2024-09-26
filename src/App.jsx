@@ -6,28 +6,29 @@ import AuthPage from './pages/AuthPage';
 import QuizPage from './pages/QuizPage';
 import DashboardPage from './pages/DashboardPage';
 import QuizHistoryPage from './pages/QuizHistoryPage';
+import { BannerProvider } from './contexts/BannerContext';
 
-const PrivateRoute = ({children }) => {
-  const {user} = useContext(AuthContext)
+const PrivateRoute = ({ children }) => {
+  const { user } = useContext(AuthContext)
   return user ? children : <Navigate to="/" replace />
 }
 
 const router = createHashRouter([
   {
     path: "/",
-    element: <AuthPage/>
+    element: <AuthPage />
   },
   {
     path: "quiz",
-    element: (<PrivateRoute><UserNavbar><QuizPage/></UserNavbar></PrivateRoute>)
+    element: (<PrivateRoute><UserNavbar><QuizPage /></UserNavbar></PrivateRoute>)
   },
   {
     path: "dashboard",
-    element: (<PrivateRoute><UserNavbar><DashboardPage/></UserNavbar></PrivateRoute>)
+    element: (<PrivateRoute><UserNavbar><DashboardPage /></UserNavbar></PrivateRoute>)
   },
   {
     path: "history",
-    element: (<PrivateRoute><UserNavbar><QuizHistoryPage/></UserNavbar></PrivateRoute>)
+    element: (<PrivateRoute><UserNavbar><QuizHistoryPage /></UserNavbar></PrivateRoute>)
   },
   {
     path: "*",
@@ -40,7 +41,9 @@ const App = () => {
 
   return (
     <AuthProvider>
-      <RouterProvider router={router} />
+      <BannerProvider>
+        <RouterProvider router={router} />
+      </BannerProvider>
     </AuthProvider>
   );
 };
