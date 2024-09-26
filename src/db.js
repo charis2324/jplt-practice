@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 
-const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_KEY)
+const supabase = createClient(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY)
 
 async function update_user_quiz_answer(p_question_id, p_quiz_session_id, p_user_answer) {
     let { _, error } = await supabase
@@ -24,9 +24,9 @@ async function get_user_profile(p_user_id) {
         return data
     }
 }
-async function get_user_stats(){
+async function get_user_stats() {
     let { data, error } = await supabase
-  .rpc('get_user_stats')
+        .rpc('get_user_stats')
     if (error) {
         console.error(error)
         return null;
@@ -129,13 +129,13 @@ async function update_quiz_session_responses(p_quiz_session_id, p_session_respon
     if (error) throw new Error(`Failed to submit quiz: ${error.message}`)
     return data
 }
-async function get_user_quiz_sessions_history(p_offset, p_limit = null){
+async function get_user_quiz_sessions_history(p_offset, p_limit = null) {
     let { data, error } = await supabase
-  .rpc('get_user_quiz_sessions_history', {
-    p_limit, 
-    p_offset
-  })
-  if (error) throw new Error(`Failed to submit quiz: ${error.message}`)
-  return data
+        .rpc('get_user_quiz_sessions_history', {
+            p_limit,
+            p_offset
+        })
+    if (error) throw new Error(`Failed to submit quiz: ${error.message}`)
+    return data
 }
-export { get_user_quiz_sessions_history, get_user_stats, update_quiz_session_responses, submit_user_quiz_answers, get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile,  get_new_quiz, report_question, supabase };
+export { get_user_quiz_sessions_history, get_user_stats, update_quiz_session_responses, submit_user_quiz_answers, get_in_progress_quiz, has_quiz_in_progress, update_user_quiz_answer, get_user_profile, update_user_profile, get_new_quiz, report_question, supabase };
