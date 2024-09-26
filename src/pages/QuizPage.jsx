@@ -1,8 +1,9 @@
 import React, { useState, useCallback, useContext, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import MultipleChoiceQuiz from '../components/MultipleChoiceQuiz';
 import QuizConfigurator from '../components/QuizConfigurator';
 import QuestionInstruction from '../components/QuestionInstruction';
-import { get_new_quiz, get_in_progress_quiz,has_quiz_in_progress } from '../db';
+import { get_new_quiz, get_in_progress_quiz, has_quiz_in_progress } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
 import QuizContinue from '../components/QuizContinue';
 
@@ -14,29 +15,48 @@ const QuizPage = () => {
   const [quizStarted, setQuizStarted] = useState(false);
   const [hasQuizInProgress, setHasQuizInProgress] = useState(true);
   const [isContinue, setIsContinue] = useState(false);
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+
+  // Access state from <Link>
+  const location = useLocation();
+  // Reset state when resetQuiz is true
+  useEffect(() => {
+    if (location.state && location.state.resetQuiz) {
+      setQuizData(null);
+      setIsLoading(false);
+      setError(null);
+      setQuizConfig({ questionCount: 10, jlptLevel: 5 });
+      setQuizStarted(false);
+      setHasQuizInProgress(true);
+      setIsContinue(false);
+
+      // Avoids potential re-renders caused by location state changes
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state])
+
   const checkQuizProgress = useCallback(async (userId) => {
     setIsLoading(true);
     const has_quiz = await has_quiz_in_progress(userId);
     console.log(has_quiz)
     setIsLoading(false);
     setHasQuizInProgress(has_quiz);
-    }, []);
+  }, []);
   useEffect(() => {
     checkQuizProgress(user.id);
-}, [user.id]);
+  }, [user.id]);
   const fetchQuizData = useCallback(async (is_new_quiz) => {
     setIsLoading(true);
     setError(null);
-  
+
     try {
-      const fetchedQuizData = await (is_new_quiz 
+      const fetchedQuizData = await (is_new_quiz
         ? get_new_quiz(quizConfig.questionCount, quizConfig.jlptLevel, user.id)
         : get_in_progress_quiz(user.id));
       if (!fetchedQuizData) {
         throw new Error('No quiz data received');
       }
-  
+
       setQuizData(fetchedQuizData);
       setQuizStarted(true);
     } catch (e) {
@@ -80,22 +100,22 @@ const QuizPage = () => {
   if (error) {
     return <div className="text-center mt-8 text-red-600">{error}</div>;
   }
-  
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6 text-center">JLPT Quiz</h1>
       {!quizStarted && (
         <div className='lg:flex lg:flex-row-reverse lg:items-center'>
           <div className='lg:w-1/2'>
-          {hasQuizInProgress && <QuizContinue onContinue={handleContinue}/>}
-          <QuizConfigurator
-            onConfigChange={handleConfigChange}
-            currentConfig={quizConfig}
-            onStart={handleStart}
-          />
+            {hasQuizInProgress && <QuizContinue onContinue={handleContinue} />}
+            <QuizConfigurator
+              onConfigChange={handleConfigChange}
+              currentConfig={quizConfig}
+              onStart={handleStart}
+            />
           </div>
           <div className='lg:w-1/2'>
-          <QuestionInstruction />
+            <QuestionInstruction />
           </div>
         </div>
       )}

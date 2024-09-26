@@ -11,7 +11,7 @@ function UserNavbar({ children }) {
 
     const handleLogout = async () => {
         await logout();
-        navigate('/'); 
+        navigate('/');
     };
 
     const toggleMenu = () => {
@@ -23,11 +23,11 @@ function UserNavbar({ children }) {
             <nav className="bg-white shadow-md">
                 <div className="container md:flex md:justify-between mx-auto px-4 py-3">
                     <div className="flex justify-between items-center">
-                        <Link to="/quiz" className="flex items-center align-center gap-2">
+                        <Link to="/quiz" className="flex items-center align-center gap-2" state={{ resetQuiz: true }}>
                             <img src={IconImage} alt="icon" className="h-10 w-10 object-contain" />
                             <span className="text-2xl font-bold text-blue-600 hover:text-blue-800 transition duration-300">JPLT Practice</span>
                         </Link>
-                        <button 
+                        <button
                             className="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none"
                             onClick={toggleMenu}
                         >
