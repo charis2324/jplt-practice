@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import StatsCard from "./StatsCard";
 import StatsCardWithQuestion from './StatsCardWithQuestion';
+import LoadingIndicator from './LoadingIndicator';
 
 const Dashboard = ({ userStats, isLoading }) => {
     console.log(userStats);
@@ -105,7 +106,7 @@ const Dashboard = ({ userStats, isLoading }) => {
         return (
             <div className="p-6">
                 <div className="max-w-7xl mx-auto">
-                    <p className="text-center">Loading...</p>
+                    <LoadingIndicator />
                 </div>
             </div>
         );

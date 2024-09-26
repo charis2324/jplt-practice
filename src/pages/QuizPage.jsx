@@ -6,6 +6,7 @@ import QuestionInstruction from '../components/QuestionInstruction';
 import { get_new_quiz, get_in_progress_quiz, has_quiz_in_progress } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
 import QuizContinue from '../components/QuizContinue';
+import LoadingIndicator from '../components/LoadingIndicator';
 
 const QuizPage = () => {
   const [quizData, setQuizData] = useState(null);
@@ -94,7 +95,9 @@ const QuizPage = () => {
     setQuizData(null);
   }
   if (isLoading) {
-    return <div className="text-center mt-8">Loading...</div>;
+    return <div className="text-center mt-8">
+      <LoadingIndicator />
+    </div>;
   }
 
   if (error) {
