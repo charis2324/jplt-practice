@@ -167,3 +167,24 @@ export async function getProfile() {
         throw error;
     }
 }
+
+export async function getProfileById(userId) {
+    if (!userId) {
+        throw new Error('User Id is required');
+    }
+    // userId = null will return the profile of the current authenticated user.
+    try {
+        const { data, error } = await supabase.rpc('get_profile_by_id', {
+            p_user_id: userId
+        })
+
+        if (error) {
+            throw new Error(`Failed to get profile: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error getting profile:', error);
+        throw error;
+    }
+}

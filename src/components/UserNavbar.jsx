@@ -4,9 +4,11 @@ import { Link, useNavigate } from "react-router-dom";
 import UsernameInput from "./UsernameInput";
 import IconImage from "../assets/icon.png"
 import Banner from "./Banner";
+import LoadingIndicator from "./LoadingIndicator";
+
 
 function UserNavbar({ children }) {
-    const { logout } = useContext(AuthContext);
+    const { logout, hasUserAndProfile, profile } = useContext(AuthContext);
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -38,7 +40,7 @@ function UserNavbar({ children }) {
                         </button>
                     </div>
                     <div className={`${isMenuOpen ? 'flex' : 'hidden'} md:flex flex-col md:flex-row md:items-center md:space-x-6 mt-4 md:mt-0`}>
-                        <span className="text-gray-600 font-medium py-2 md:py-0">{`Welcome, ${''}`}</span>
+                        {profile?.display_name && <span className="text-gray-600 font-medium py-2 md:py-0">{`Welcome, ${profile.display_name}`}</span>}
                         <Link to="/quiz" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">Quiz</Link>
                         <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">Dashboard</Link>
                         <Link to="/history" className="text-gray-700 hover:text-blue-600 transition duration-300 py-2 md:py-0 font-bold">History</Link>
@@ -53,10 +55,9 @@ function UserNavbar({ children }) {
             </nav>
             <Banner />
             <main className="flex-grow container mx-auto p-4">
-                {/* {hasUserAndProfile ? (
+                {hasUserAndProfile ? (
                     profile.display_name ? children : <UsernameInput />
-                ) : null} */}
-                {children}
+                ) : <LoadingIndicator />}
             </main>
             <footer className="bg-gray-200 p-4 text-center">
                 <p>&copy; 2024 JPLT Practice. All rights reserved.</p>

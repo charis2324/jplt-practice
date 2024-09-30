@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const QuestionInstruction = () => {
   const [showEnglish, setShowEnglish] = useState(true);
@@ -23,13 +23,13 @@ const QuestionInstruction = () => {
             </p>
           ) : (
             <p>
-              Choose the most appropriate word to fill in the blank in the following sentence. 
-              When options are given in jishokei (dictionary form), consider the appropriate 
+              Choose the most appropriate word to fill in the blank in the following sentence.
+              When options are given in jishokei (dictionary form), consider the appropriate
               conjugation that fits the context of the sentence.
             </p>
           )}
         </div>
-        
+
         <h3 className="text-xl font-semibold mb-2 text-gray-800">
           {showEnglish ? 'Example:' : '例：'}
         </h3>
@@ -48,10 +48,10 @@ const QuestionInstruction = () => {
             {showEnglish && ' - demasu'}）
           </p>
         </div>
-        
+
         <p className="mt-4 text-sm text-gray-600">
-          {showEnglish 
-            ? 'Note: This example shows options in jishokei. Some questions may have options in different forms.' 
+          {showEnglish
+            ? 'Note: This example shows options in jishokei. Some questions may have options in different forms.'
             : '注：この例では選択肢が辞書形で示されていますが、問題によっては異なる形で提示される場合があります。'}
         </p>
       </div>
