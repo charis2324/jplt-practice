@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { createHashRouter, RouterProvider, Navigate } from 'react-router-dom';
 import { AuthContext, AuthProvider } from './contexts/AuthContext';
 import UserNavbar from './components/UserNavbar';
@@ -22,14 +22,14 @@ const router = createHashRouter([
     path: "quiz",
     element: (<PrivateRoute><UserNavbar><QuizPage /></UserNavbar></PrivateRoute>)
   },
-  {
-    path: "dashboard",
-    element: (<PrivateRoute><UserNavbar><DashboardPage /></UserNavbar></PrivateRoute>)
-  },
-  {
-    path: "history",
-    element: (<PrivateRoute><UserNavbar><QuizHistoryPage /></UserNavbar></PrivateRoute>)
-  },
+  // {
+  //   path: "dashboard",
+  //   element: (<PrivateRoute><UserNavbar><DashboardPage /></UserNavbar></PrivateRoute>)
+  // },
+  // {
+  //   path: "history",
+  //   element: (<PrivateRoute><UserNavbar><QuizHistoryPage /></UserNavbar></PrivateRoute>)
+  // },
   {
     path: "*",
     element: <Navigate to="/" replace />,

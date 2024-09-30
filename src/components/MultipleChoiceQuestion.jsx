@@ -1,11 +1,10 @@
 import React from 'react';
 
 const MultipleChoiceQuestion = ({
-  question_number,
-  question_id,
-  question,
-  options,
-  correctAnswer,
+  questionNumber,
+  questionId,
+  quizSessionAnswerId,
+  questionData,
   showCorrectAnswer,
   selectedOption,
   onOptionSelect,
@@ -14,6 +13,9 @@ const MultipleChoiceQuestion = ({
   showShadow = true,
   useSpacing = true
 }) => {
+  const questionText = questionData?.question_text
+  const options = questionData?.options
+  const correctAnswer = questionData?.correct_answer
   // Determine the CSS classes for each option based on the state
   const getOptionClass = (optionKey) => {
     if (!showCorrectAnswer) {
@@ -37,41 +39,41 @@ const MultipleChoiceQuestion = ({
     <div className={`bg-white rounded-lg ${useSpacing ? 'p-6 mb-6' : ''} ${showShadow ? 'shadow-md' : ''}`}>
       <div className="mb-2 flex justify-between items-start">
         <div>
-          {!isNaN(question_number) && (
-            <span className="font-bold text-lg text-blue-600">Q {question_number + 1}:</span>
+          {!isNaN(questionNumber) && (
+            <span className="font-bold text-lg text-blue-600">Q {questionNumber + 1}:</span>
           )}
         </div>
         {showReportBtn && (
           <button
-            onClick={() => onReportQuestion(question_id)}
+            onClick={() => onReportQuestion(questionId)}
             className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors text-sm font-medium"
           >
             Report Low Quality
           </button>
         )}
       </div>
-      <p className="mb-4 text-gray-800">{question}</p>
+      <p className="mb-4 text-gray-800">{questionText}</p>
       <div className="space-y-2">
-        {Object.entries(options).map(([key, value]) => (
+        {options.map(({ option_id, text }) => (
           <label
-            key={key}
+            key={option_id}
             className={`flex items-center p-3 rounded-md cursor-pointer transition-colors ${getOptionClass(
-              key
+              option_id
             )}`}
           >
             <input
               type="radio"
-              name={`question-${question_number}`}
-              value={key}
-              checked={selectedOption === key}
-              onChange={() => onOptionSelect(key)}
+              name={`question-${questionNumber}`}
+              value={option_id}
+              checked={selectedOption === option_id}
+              onChange={() => onOptionSelect(option_id)}
               className="form-radio h-5 w-5 text-blue-600"
               disabled={showCorrectAnswer}
             />
             <span className="ml-2 text-gray-700">
-              {key}. {value}
+              {option_id}. {text}
             </span>
-            {showCorrectAnswer && key === correctAnswer && (
+            {showCorrectAnswer && option_id === correctAnswer && (
               <span className="ml-2 text-green-600 font-bold">(Correct Answer)</span>
             )}
           </label>

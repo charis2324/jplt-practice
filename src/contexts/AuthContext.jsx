@@ -1,58 +1,19 @@
-import React, { createContext, useState, useEffect, useCallback, useMemo } from 'react'
-import { supabase, get_user_profile } from '../db'
-import debounce from 'lodash.debounce'
+import { createContext, useState, useEffect, useCallback, useMemo } from 'react'
+import { supabase } from '../db'
 
 export const AuthContext = createContext()
 
-const LOCALSTORAGE_PROFILE_KEY = 'app_user_profile'
-
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null)
-  const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-
-  const fetchProfile = useCallback(async (userId) => {
-    try {
-      const userProfile = await get_user_profile(userId)
-      setProfile(userProfile)
-      localStorage.setItem(LOCALSTORAGE_PROFILE_KEY, JSON.stringify(userProfile))
-      return userProfile
-    } catch (error) {
-      console.error('Error fetching user profile:', error)
-      return null
-    }
-  }, [])
-
-  const debouncedFetchProfile = useMemo(
-    () => debounce(fetchProfile, 300),
-    [fetchProfile]
-  )
-
-  const clearLocalStorage = useCallback(() => {
-    localStorage.removeItem(LOCALSTORAGE_PROFILE_KEY)
-  }, [])
 
   const handleSession = useCallback((session) => {
     if (session) {
       setUser(session.user)
-      
-      const storedProfile = localStorage.getItem(LOCALSTORAGE_PROFILE_KEY)
-      if (storedProfile) {
-        const parsedProfile = JSON.parse(storedProfile)
-        if (parsedProfile.user_id === session.user.id) {
-          setProfile(parsedProfile)
-        } else {
-          debouncedFetchProfile(session.user.id)
-        }
-      } else {
-        debouncedFetchProfile(session.user.id)
-      }
     } else {
       setUser(null)
-      setProfile(null)
-      clearLocalStorage()
     }
-  }, [debouncedFetchProfile, clearLocalStorage])
+  }, [])
 
   useEffect(() => {
     const checkSession = async () => {
@@ -83,12 +44,11 @@ export const AuthProvider = ({ children }) => {
     })
     return { data, error }
   }, [])
-  
+
   const logout = useCallback(async () => {
     const { error } = await supabase.auth.signOut()
-    clearLocalStorage()
-    return { error }  
-  }, [clearLocalStorage])
+    return { error }
+  }, [])
 
   const register = useCallback(async (email, password) => {
     const { data, error } = await supabase.auth.signUp({
@@ -98,28 +58,13 @@ export const AuthProvider = ({ children }) => {
     return { data, error }
   }, [])
 
-  const refreshProfile = useCallback(async () => {
-    if (user) {
-      const updatedProfile = await fetchProfile(user.id)
-      if (updatedProfile) {
-        setProfile(updatedProfile)
-        localStorage.setItem(LOCALSTORAGE_PROFILE_KEY, JSON.stringify(updatedProfile))
-      }
-      return updatedProfile
-    }
-    return null
-  }, [user, fetchProfile])
-
   const value = useMemo(() => ({
     user,
-    profile,
     login,
     logout,
     register,
     loading,
-    refreshProfile,
-    hasUserAndProfile: !!user && !!profile  
-  }), [user, profile, login, logout, register, loading, refreshProfile])
+  }), [user, login, logout, register, loading])
 
   return (
     <AuthContext.Provider value={value}>

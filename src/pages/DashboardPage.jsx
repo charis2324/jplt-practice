@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { get_user_stats } from "../db";
+// import { get_user_stats } from "../db";
 import Dashboard from "../components/DashBoard";
 
 function DashboardPage() {
@@ -14,7 +14,7 @@ function DashboardPage() {
                 setUserStats(stats);
             } catch (error) {
                 console.error("Failed to fetch user stats:", error);
-            }finally{
+            } finally {
                 setIsLoading(false)
             }
         };
