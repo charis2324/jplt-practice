@@ -152,12 +152,10 @@ export async function setDisplayName(newDisplayName) {
     }
 }
 
-export async function getProfile(userId = null) {
+export async function getProfile() {
     // userId = null will return the profile of the current authenticated user.
     try {
-        const { data, error } = await supabase.rpc('get_profile', {
-            p_user_id: userId
-        });
+        const { data, error } = await supabase.rpc('get_profile');
 
         if (error) {
             throw new Error(`Failed to get profile: ${error.message}`);
