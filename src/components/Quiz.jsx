@@ -3,23 +3,29 @@ import MultipleChoiceQuestion from './MultipleChoiceQuestion';
 import { updateQuizSessionAnswers, submitQuizSession } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
 import debounce from 'lodash.debounce';
+import LoadingIndicator from './LoadingIndicator';
+
+const parseQuizDataToQuestionState = (quizData) => {
+  return quizData.questions.map((question) => {
+    const answerState = question.answer_state;
+    return {
+      questionId: question.question_id,
+      quizSessionAnswerId: answerState?.quiz_session_answer_id,
+      userAnswer: answerState?.user_answer || {},
+      isReported: answerState?.is_reported,
+      isCorrect: answerState?.is_correct
+    }
+  })
+}
 
 const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
   // const { user } = useContext(AuthContext);
   const session_id = quizData.quiz_session_id;
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [error, setError] = useState(null);
+  const [isSubmitLoading, setSubmitLoading] = useState(false);
+  const initialQuestionsState = parseQuizDataToQuestionState(quizData)
 
-  // Initialize state using useReducer
-  const initialQuestionsState = quizData.questions.map((question) => {
-    const answerState = question.answer_state;
-    return {
-      questionId: question.question_id,
-      quizSessionAnswerId: answerState?.quiz_session_answer_id,
-      userAnswer: answerState?.user_answer || {},
-      isReported: answerState?.is_reported
-    }
-  });
   const questionsReducer = (state, action) => {
     switch (action.type) {
       case 'SINGLE_OPTION':
@@ -30,6 +36,8 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
         return state.map((q, index) =>
           index === action.payload.index ? { ...q, isReported: true } : q
         );
+      case 'FULL_UPDATE':
+        return action.payload.questionsState;
       default:
         return state;
     }
@@ -72,7 +80,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
   const calculateScore = () => {
     return questionsState.reduce((score, q) => {
       if (q.isReported) return score;
-      return score + (q.selectedAnswer === q.correctAnswer ? 1 : 0);
+      return score + (q.isCorrect ? 1 : 0);
     }, 0);
   };
 
@@ -80,7 +88,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
 
   const handleSubmitQuiz = async () => {
     const unansweredQuestions = questionsState.reduce((acc, q, index) => {
-      if (!q.isReported && q.userAnswer?.value !== null) acc.push(index + 1);
+      if (!q.isReported && (q.userAnswer?.value == null)) acc.push(index + 1);
       return acc;
     }, []);
 
@@ -93,13 +101,18 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
     } else {
       try {
         debouncedUpdateSessionResponses.flush();
+        setSubmitLoading(true);
         await updateSessionResponses();
-        await submitQuizSession(session_id);
+        const submitQuizData = await submitQuizSession(session_id);
+        const submitQuestionState = parseQuizDataToQuestionState(submitQuizData);
+        dispatch({ type: 'FULL_UPDATE', payload: { questionsState: submitQuestionState } })
         setQuizSubmitted(true);
         setError(null);
       } catch (e) {
         console.error('Error submitting quiz:', e);
         setError(e.message);
+      } finally {
+        setSubmitLoading(false);
       }
     }
   };
@@ -113,7 +126,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
       {quizData.questions.map((question, index) => {
         const qState = questionsState[index];
         const questionType = question.question_type;
-
+        const questionData = question.question_data;
         return (
           <div key={question.question_id} className="mb-8">
             {(() => {
@@ -122,10 +135,10 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
                   return (
                     <MultipleChoiceQuestion
                       questionNumber={index}
-                      questionId={question.question_id}
-                      quizSessionAnswerId={qState.quizSessionAnswerId}
-                      questionData={question.question_data}
-                      showCorrectAnswer={quizSubmitted || qState.isReported}
+                      questionText={questionData.question_text}
+                      options={questionData.options}
+                      correctAnswer={questionData.correct_answer.value}
+                      showCorrectAnswer={quizSubmitted || qState.isReported || qState.isCorrect != null}
                       selectedOption={qState.userAnswer?.value}
                       onOptionSelect={(option) => handleAnswerChange(index, { 'type': question.question_data.correct_answer.type, 'value': option })}
                       onReportQuestion={() => handleReportQuestion(index)}
@@ -160,7 +173,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
         </div>
       )}
 
-      {!quizSubmitted ? (
+      {!quizSubmitted ? (!isSubmitLoading ? (
         <div className="mt-8 text-center space-x-3">
           <button
             onClick={handleSubmitQuiz}
@@ -174,7 +187,9 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
           >
             Exit Quiz
           </button>
-        </div>
+        </div>) : (
+        <LoadingIndicator />
+      )
       ) : (
         <div className="mt-8 text-center space-x-3">
           <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
@@ -187,6 +202,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
           >
             Exit Quiz
           </button>
+
           {!isContinue && (
             <button
               onClick={onNextQuiz}

@@ -1,31 +1,35 @@
 import React from 'react';
 
+function sortByOptionId(arr) {
+  return [...arr].sort((a, b) => a.option_id.localeCompare(b.option_id));
+}
+
 const MultipleChoiceQuestion = ({
   questionNumber,
-  questionId,
-  quizSessionAnswerId,
-  questionData,
+  questionText,
+  options,
+  correctAnswer,
   showCorrectAnswer,
   selectedOption,
   onOptionSelect,
   onReportQuestion,
   showReportBtn = true,
   showShadow = true,
-  useSpacing = true
+  useSpacing = true,
+  sortOptions = true
 }) => {
-  const questionText = questionData?.question_text
-  const options = questionData?.options
-  const correctAnswer = questionData?.correct_answer
-  // Determine the CSS classes for each option based on the state
-  const getOptionClass = (optionKey) => {
+  const sortedOptions = React.useMemo(() =>
+    sortOptions ? sortByOptionId(options) : options,
+    [options, sortOptions]
+  );
+
+  const getOptionClass = React.useCallback((optionKey) => {
     if (!showCorrectAnswer) {
-      // Before showing correct answers
       return selectedOption === optionKey
         ? 'bg-blue-100 border-blue-500'
         : 'bg-gray-100 hover:bg-gray-200';
     }
 
-    // After showing correct answers
     if (optionKey === correctAnswer) {
       return 'bg-green-100 border-green-500';
     }
@@ -33,7 +37,7 @@ const MultipleChoiceQuestion = ({
       return 'bg-red-100 border-red-500';
     }
     return 'bg-gray-100';
-  };
+  }, [showCorrectAnswer, selectedOption, correctAnswer]);
 
   return (
     <div className={`bg-white rounded-lg ${useSpacing ? 'p-6 mb-6' : ''} ${showShadow ? 'shadow-md' : ''}`}>
@@ -45,7 +49,7 @@ const MultipleChoiceQuestion = ({
         </div>
         {showReportBtn && (
           <button
-            onClick={() => onReportQuestion(questionId)}
+            onClick={onReportQuestion}
             className="px-3 py-2 bg-yellow-100 text-yellow-800 rounded-md hover:bg-yellow-200 transition-colors text-sm font-medium"
           >
             Report Low Quality
@@ -54,12 +58,10 @@ const MultipleChoiceQuestion = ({
       </div>
       <p className="mb-4 text-gray-800">{questionText}</p>
       <div className="space-y-2">
-        {options.map(({ option_id, text }) => (
+        {sortedOptions.map(({ option_id, text }) => (
           <label
             key={option_id}
-            className={`flex items-center p-3 rounded-md cursor-pointer transition-colors ${getOptionClass(
-              option_id
-            )}`}
+            className={`flex items-center p-3 rounded-md cursor-pointer transition-colors ${getOptionClass(option_id)}`}
           >
             <input
               type="radio"

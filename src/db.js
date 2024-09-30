@@ -130,3 +130,42 @@ export async function submitQuizSession(quizSessionId) {
         throw error;
     }
 }
+
+export async function setDisplayName(newDisplayName) {
+    if (!newDisplayName) {
+        throw new Error('New display name is required');
+    }
+
+    try {
+        const { data, error } = await supabase.rpc('set_display_name', {
+            p_new_display_name: newDisplayName
+        });
+
+        if (error) {
+            throw new Error(`Failed to set display name: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error setting display name:', error);
+        throw error;
+    }
+}
+
+export async function getProfile(userId = null) {
+    // userId = null will return the profile of the current authenticated user.
+    try {
+        const { data, error } = await supabase.rpc('get_profile', {
+            p_user_id: userId
+        });
+
+        if (error) {
+            throw new Error(`Failed to get profile: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error getting profile:', error);
+        throw error;
+    }
+}
