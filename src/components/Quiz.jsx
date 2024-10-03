@@ -19,7 +19,6 @@ const parseQuizDataToQuestionState = (quizData) => {
 }
 
 const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
-  // const { user } = useContext(AuthContext);
   const session_id = quizData.quiz_session_id;
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [error, setError] = useState(null);
@@ -74,7 +73,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
   const handleReportQuestion = (index) => {
     dispatch({ type: 'REPORT_QUESTION', payload: { index } });
     setError(null);
-    debouncedUpdateSessionResponses();
+    // debouncedUpdateSessionResponses();
   };
 
   const calculateScore = () => {
@@ -135,6 +134,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
                   return (
                     <MultipleChoiceQuestion
                       questionNumber={index}
+                      quizSessionAnswerId={qState.quizSessionAnswerId}
                       questionText={questionData.question_text}
                       options={questionData.options}
                       correctAnswer={questionData.correct_answer.value}
@@ -142,6 +142,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
                       selectedOption={qState.userAnswer?.value}
                       onOptionSelect={(option) => handleAnswerChange(index, { 'type': question.question_data.correct_answer.type, 'value': option })}
                       onReportQuestion={() => handleReportQuestion(index)}
+                      showReportBtn={!qState.isReported}
                     />
                   );
                 // Add more cases as needed

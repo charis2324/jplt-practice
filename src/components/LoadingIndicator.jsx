@@ -1,9 +1,15 @@
-import React from 'react';
+const LoadingIndicator = ({ sizeRem = 3 }) => {
 
-const LoadingIndicator = () => (
-    <div className="flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-blue-500"></div>
-    </div>
-);
+    return (
+        <div className="flex justify-center items-center" style={{
+            '--size': `${sizeRem}rem`
+        }}>
+            <div className="animate-spin rounded-full border-t-4 border-b-4 border-blue-500" style={{
+                width: 'var(--size)',
+                height: 'var(--size)',
+            }}></div>
+        </div >
+    )
+}
 
 export default LoadingIndicator;

@@ -188,3 +188,49 @@ export async function getProfileById(userId) {
         throw error;
     }
 }
+
+export async function reportQuestionByIds(questionId, quizSessionId, reportReason) {
+    if (!questionId) {
+        throw new Error('Question Id is required');
+    }
+    if (!quizSessionId) {
+        throw new Error('Quiz session Id is required');
+    }
+    try {
+        const { data, error } = await supabase.rpc('report_question_by_ids', {
+            p_question_id: questionId,
+            p_quiz_session_id: quizSessionId,
+            p_report_reason: reportReason
+        })
+
+        if (error) {
+            throw new Error(`Failed to report question: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error reporting question:', error);
+        throw error;
+    }
+}
+
+export async function reportQuestionBySessionAnswer(quizSessionAnswerId, reportReason) {
+    if (!quizSessionAnswerId) {
+        throw new Error('Quiz session answer Id is required');
+    }
+    try {
+        const { data, error } = await supabase.rpc('report_question_by_session_answer', {
+            p_quiz_session_answer_id: quizSessionAnswerId,
+            p_report_reason: reportReason
+        })
+
+        if (error) {
+            throw new Error(`Failed to report question: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error reporting question:', error);
+        throw error;
+    }
+}
