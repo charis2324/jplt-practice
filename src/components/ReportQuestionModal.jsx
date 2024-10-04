@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { reportQuestionBySessionAnswer } from "../db";
 import LoadingIndicator from "./LoadingIndicator";
 import PropTypes from 'prop-types';
@@ -27,6 +27,27 @@ const ReportQuestionModal = ({ quizSessionAnswerId, isOpen, onClose, onReportSuc
         setReason('');
         onClose();
     }, [onClose]);
+
+    const handleEscape = useCallback((e) => {
+        if (e.key === "Escape") {
+            handleClose();
+        }
+    }, [handleClose])
+
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+            document.addEventListener('keydown', handleEscape);
+        } else {
+            document.body.style.overflow = 'unset';
+            document.removeEventListener('keydown', handleEscape);
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+            document.removeEventListener('keydown', handleEscape);
+        }
+    }, [isOpen, handleEscape]);
+
 
     if (!isOpen) return null;
 
