@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import PropTypes from 'prop-types';
 import ReportQuestionModal from './ReportQuestionModal';
 import { BannerContext } from '../contexts/BannerContext'; // Assuming you want to show banners on report
-import { reportQuestionBySessionAnswer } from '../db';
+
 
 function sortByOptionId(arr) {
   return [...arr].sort((a, b) => a.option_id.localeCompare(b.option_id));

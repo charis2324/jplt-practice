@@ -1,7 +1,6 @@
-import React, { useContext, useEffect, useState, useReducer, useRef, useMemo } from 'react';
+import { useEffect, useState, useReducer, useRef, useMemo } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
 import { updateQuizSessionAnswers, submitQuizSession } from '../db';
-import { AuthContext } from '../contexts/AuthContext';
 import debounce from 'lodash.debounce';
 import LoadingIndicator from './LoadingIndicator';
 

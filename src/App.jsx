@@ -22,10 +22,10 @@ const router = createHashRouter([
     path: "quiz",
     element: (<PrivateRoute><UserNavbar><QuizPage /></UserNavbar></PrivateRoute>)
   },
-  // {
-  //   path: "dashboard",
-  //   element: (<PrivateRoute><UserNavbar><DashboardPage /></UserNavbar></PrivateRoute>)
-  // },
+  {
+    path: "dashboard",
+    element: (<PrivateRoute><UserNavbar><DashboardPage /></UserNavbar></PrivateRoute>)
+  },
   // {
   //   path: "history",
   //   element: (<PrivateRoute><UserNavbar><QuizHistoryPage /></UserNavbar></PrivateRoute>)

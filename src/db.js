@@ -234,3 +234,33 @@ export async function reportQuestionBySessionAnswer(quizSessionAnswerId, reportR
         throw error;
     }
 }
+
+export async function getKeyMetrics() {
+    try {
+        const { data, error } = await supabase.rpc('get_key_metrics')
+
+        if (error) {
+            throw new Error(`Failed to get key metrics: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error getting key metrics:', error);
+        throw error;
+    }
+}
+
+export async function getKeyQuestionsDetails() {
+    try {
+        const { data, error } = await supabase.rpc('get_key_questions_details')
+
+        if (error) {
+            throw new Error(`Failed to get key questions details: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error getting key questions details:', error);
+        throw error;
+    }
+}

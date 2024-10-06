@@ -1,24 +1,18 @@
-import React, { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import StatsCard from "./StatsCard";
 import StatsCardWithQuestion from './StatsCardWithQuestion';
 import LoadingIndicator from './LoadingIndicator';
 
-const Dashboard = ({ userStats, isLoading }) => {
-    console.log(userStats);
+function Dashboard({ userStats, keyQuestions, isLoading }) {
+    console.log(keyQuestions);
 
-    const parseQuestionDetails = (q) => {
+    const parseQuestionDetails = (q, r = null) => {
         if (!q) return null;
         return {
-            id: q.id,
-            question: q.question_text,
-            options: {
-                A: q.option_a,
-                B: q.option_b,
-                C: q.option_c,
-                D: q.option_d
-            },
-            correctAnswer: q.correct_answer,
-            selectedOption: q.response_answer
+            questionText: q.question_text,
+            options: q.options,
+            correctAnswer: q.correct_answer?.value,
+            selectedOption: r?.value
         };
     };
 
@@ -27,8 +21,8 @@ const Dashboard = ({ userStats, isLoading }) => {
         return `${value} ${value === 1 || value === 0 ? single : plural}`;
     };
 
-    const formatDays = (value) => formatUnit(value, 'day', 'days');
-    const formatTimes = (value) => formatUnit(value, 'time', 'times');
+    const formatDays = useCallback((value) => formatUnit(value, 'day', 'days'), []);
+    const formatTimes = useCallback((value) => formatUnit(value, 'time', 'times'), []);
 
     const stats = useMemo(() => [
         {
@@ -38,12 +32,12 @@ const Dashboard = ({ userStats, isLoading }) => {
         },
         {
             title: "Total Questions",
-            value: userStats?.total_questions,
+            value: userStats?.total_questions_completed,
             description: "Your journey in numbers"
         },
         {
             title: "Distinct Questions",
-            value: userStats?.total_distinct_questions,
+            value: userStats?.distinct_questions_completed,
             description: "Variety in your learning"
         },
         {
@@ -63,7 +57,7 @@ const Dashboard = ({ userStats, isLoading }) => {
         },
         {
             title: "Avg. Answer Time",
-            value: userStats?.average_answer_second ? `${userStats.average_answer_second}s` : null,
+            value: userStats?.avg_answer_time ? `${userStats.avg_answer_time}s` : null,
             description: "Your swiftness"
         },
         {
@@ -73,34 +67,37 @@ const Dashboard = ({ userStats, isLoading }) => {
         },
         {
             title: "Best Streak",
-            value: formatDays(userStats?.highest_streak),
+            value: formatDays(userStats?.best_streak),
             description: "Your personal best"
         },
         {
             title: "Avg. JLPT Level",
-            value: userStats?.average_jlpt_level ? `N${userStats.average_jlpt_level.toFixed(2)}` : null,
+            value: userStats?.avg_jlpt_level ? `N${userStats.avg_jlpt_level.toFixed(2)}` : null,
             description: "Your current challenge"
         }
-    ], [userStats]);
+    ], [formatDays, userStats.accuracy_percentage, userStats.avg_answer_time, userStats.avg_jlpt_level, userStats?.best_streak, userStats?.correct_answers, userStats?.current_streak, userStats?.distinct_questions_completed, userStats.first_try_success_percentage, userStats?.quizzes_completed, userStats?.total_questions_completed]);
 
     const questionStats = useMemo(() => {
-        const mostIncorrectQuestion = userStats?.most_incorrect_question;
-        const lastest_random_active_incorrect_question = userStats?.lastest_random_active_incorrect_question
-        return mostIncorrectQuestion ? [
+        const mostRecentErroneousQuestion = keyQuestions?.most_recent_erroneous_question_data;
+        const mostRecentErroneousQuestionUserAnswer = keyQuestions?.most_recent_erroneous_user_answer;
+        const mostFrequentErroneousQuestion = keyQuestions?.most_frequent_erroneous_question_data;
+        const result = [mostRecentErroneousQuestion ?
             {
                 title: 'Recent Error',
                 value: null,
-                questionDetails: parseQuestionDetails(lastest_random_active_incorrect_question),
+                questionDetails: parseQuestionDetails(mostRecentErroneousQuestion, mostRecentErroneousQuestionUserAnswer),
                 isNegative: true
-            },
-            {
-                title: 'Most Frequent Error',
-                value: formatTimes(userStats.most_incorrect_question_incorrect_count),
-                questionDetails: parseQuestionDetails(mostIncorrectQuestion),
-                isNegative: true
-            },
-        ] : [];
-    }, [userStats]);
+            } : null,
+        mostFrequentErroneousQuestion ? {
+            title: 'Most Frequent Error',
+            value: formatTimes(keyQuestions.frequency),
+            questionDetails: parseQuestionDetails(mostFrequentErroneousQuestion),
+            isNegative: true
+        } : null
+        ];
+        console.log(result)
+        return result;
+    }, [formatTimes, keyQuestions.frequency, keyQuestions?.most_frequent_erroneous_question_data, keyQuestions?.most_recent_erroneous_question_data, keyQuestions?.most_recent_erroneous_user_answer]);
 
     if (isLoading) {
         return (
@@ -127,6 +124,6 @@ const Dashboard = ({ userStats, isLoading }) => {
             </div>
         </div>
     );
-};
+}
 
-export default React.memo(Dashboard);
+export default Dashboard;

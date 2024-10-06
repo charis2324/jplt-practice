@@ -1,28 +1,31 @@
 import { useEffect, useState } from "react";
-// import { get_user_stats } from "../db";
+import { getKeyMetrics, getKeyQuestionsDetails } from "../db";
 import Dashboard from "../components/DashBoard";
 
 function DashboardPage() {
     const [userStats, setUserStats] = useState({});
+    const [keyQuestions, setKeyQuestions] = useState({});
     const [isLoading, setIsLoading] = useState(true);
     useEffect(() => {
 
-        const getUserStats = async () => {
+        const getDashboardInfo = async () => {
             try {
                 setIsLoading(true)
-                const stats = await get_user_stats();
+                const stats = await getKeyMetrics();
+                const questions = await getKeyQuestionsDetails();
                 setUserStats(stats);
+                setKeyQuestions(questions);
             } catch (error) {
-                console.error("Failed to fetch user stats:", error);
+                console.error("Failed to fetch dashboard: ", error);
             } finally {
                 setIsLoading(false)
             }
         };
 
-        getUserStats();
+        getDashboardInfo();
     }, []);
 
-    return <Dashboard userStats={userStats} isLoading={isLoading} />;
+    return <Dashboard userStats={userStats} keyQuestions={keyQuestions} isLoading={isLoading} />;
 }
 
 export default DashboardPage;
