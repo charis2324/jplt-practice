@@ -121,19 +121,20 @@ const MultipleChoiceQuestion = ({
       </div>
 
       {/* Report Question Modal */}
-      <ReportQuestionModal
+
+      {quizSessionAnswerId && <ReportQuestionModal
         quizSessionAnswerId={quizSessionAnswerId}
         isOpen={isModalOpen}
         onClose={handleReportCancel}
         onReportSuccess={handleReportSuccess}
         questionText={`Q${questionNumber + 1}. ${questionText}`}
-      />
+      />}
     </div>
   );
 };
 
 MultipleChoiceQuestion.propTypes = {
-  questionNumber: PropTypes.number.isRequired,
+  questionNumber: PropTypes.number,
   questionText: PropTypes.string.isRequired,
   options: PropTypes.arrayOf(
     PropTypes.shape({
@@ -145,7 +146,7 @@ MultipleChoiceQuestion.propTypes = {
   quizSessionAnswerId: PropTypes.string,
   showCorrectAnswer: PropTypes.bool.isRequired,
   selectedOption: PropTypes.string,
-  onOptionSelect: PropTypes.func.isRequired,
+  onOptionSelect: PropTypes.func,
   showReportBtn: PropTypes.bool,
   showShadow: PropTypes.bool,
   useSpacing: PropTypes.bool,
