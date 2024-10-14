@@ -1,7 +1,7 @@
 import { convertToLocalTimezone } from "../utils";
 
-function QuizHistoryEntry({index, correctAnswers, totalQuestions, quizDatetime}) {
-    console.log(quizDatetime)
+function QuizHistoryEntry({ index, correctAnswers, totalQuestions, quizDatetime }) {
+
     const localDateTime = convertToLocalTimezone(quizDatetime);
 
     const scorePercentage = ((correctAnswers / totalQuestions) * 100).toFixed(0);

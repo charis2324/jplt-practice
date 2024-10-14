@@ -26,10 +26,10 @@ const router = createHashRouter([
     path: "dashboard",
     element: (<PrivateRoute><UserNavbar><DashboardPage /></UserNavbar></PrivateRoute>)
   },
-  // {
-  //   path: "history",
-  //   element: (<PrivateRoute><UserNavbar><QuizHistoryPage /></UserNavbar></PrivateRoute>)
-  // },
+  {
+    path: "history",
+    element: (<PrivateRoute><UserNavbar><QuizHistoryPage /></UserNavbar></PrivateRoute>)
+  },
   {
     path: "*",
     element: <Navigate to="/" replace />,

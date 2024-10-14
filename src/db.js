@@ -264,3 +264,18 @@ export async function getKeyQuestionsDetails() {
         throw error;
     }
 }
+
+export async function getQuizHistory() {
+    try {
+        const { data, error } = await supabase.rpc('get_quiz_history')
+
+        if (error) {
+            throw new Error(`Failed to get quiz history: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error getting quiz history:', error);
+        throw error;
+    }
+}
