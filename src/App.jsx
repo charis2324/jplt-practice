@@ -8,8 +8,10 @@ import DashboardPage from './pages/DashboardPage';
 import QuizHistoryPage from './pages/QuizHistoryPage';
 import { BannerProvider } from './contexts/BannerContext';
 
+
 const PrivateRoute = ({ children }) => {
-  const { user } = useContext(AuthContext)
+  const { user, loading } = useContext(AuthContext)
+  if (loading) return null
   return user ? children : <Navigate to="/" replace />
 }
 
