@@ -34,7 +34,7 @@ const router = createHashRouter([
   },
   {
     path: "history/:quizSessionId",
-    element: (<UserNavbar><QuizSessionResultPage /></UserNavbar>)
+    element: (<QuizSessionResultPage />)
   },
   {
     path: "*",
