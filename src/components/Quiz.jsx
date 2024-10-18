@@ -1,4 +1,4 @@
-import { useEffect, useState, useReducer, useRef, useMemo } from 'react';
+import { useEffect, useState, useReducer, useRef, useMemo, useCallback } from 'react';
 import MultipleChoiceQuestion from './MultipleChoiceQuestion';
 import { updateQuizSessionAnswers, submitQuizSession } from '../db';
 import debounce from 'lodash.debounce';
@@ -17,9 +17,9 @@ const parseQuizDataToQuestionState = (quizData) => {
   })
 }
 
-const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
+const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz, readOnly = false }) => {
   const session_id = quizData.quiz_session_id;
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState(readOnly);
   const [error, setError] = useState(null);
   const [isSubmitLoading, setSubmitLoading] = useState(false);
   const initialQuestionsState = parseQuizDataToQuestionState(quizData)
@@ -48,28 +48,34 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
     questionsStateRef.current = questionsState;
   }, [questionsState]);
 
+  useEffect(() => {
+    setQuizSubmitted(readOnly);
+  }, [readOnly]);
+
   // Debounced function to update session responses
-  const updateSessionResponses = async () => {
+  const updateSessionResponses = useCallback(async () => {
+    if (readOnly) return;
     try {
       await updateQuizSessionAnswers(questionsStateRef.current);
     } catch (error) {
       console.error('Failed to update session responses:', error);
     }
-  };
+  }, [readOnly]);
 
   const debouncedUpdateSessionResponses = useMemo(
     () => debounce(updateSessionResponses, 1000),
-    []
+    [updateSessionResponses]
   );
 
   const handleAnswerChange = (index, { type, value }) => {
-    if (quizSubmitted) return;
+    if (quizSubmitted || readOnly) return;
     dispatch({ type: type, payload: { index, value } });
     setError(null);
     debouncedUpdateSessionResponses();
   };
 
   const handleReportQuestion = (index) => {
+    if (readOnly) return;
     dispatch({ type: 'REPORT_QUESTION', payload: { index } });
     setError(null);
     // debouncedUpdateSessionResponses();
@@ -85,6 +91,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
   const validQuestionCount = questionsState.filter((q) => !q.isReported).length;
 
   const handleSubmitQuiz = async () => {
+    if (readOnly) return;
     const unansweredQuestions = questionsState.reduce((acc, q, index) => {
       if (!q.isReported && (q.userAnswer?.value == null)) acc.push(index + 1);
       return acc;
@@ -137,11 +144,11 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
                       questionText={questionData.question_text}
                       options={questionData.options}
                       correctAnswer={questionData.correct_answer.value}
-                      showCorrectAnswer={quizSubmitted || qState.isReported || qState.isCorrect != null}
+                      showCorrectAnswer={quizSubmitted || qState.isReported || qState.isCorrect != null || readOnly}
                       selectedOption={qState.userAnswer?.value}
                       onOptionSelect={(option) => handleAnswerChange(index, { 'type': question.question_data.correct_answer.type, 'value': option })}
                       onReportQuestion={() => handleReportQuestion(index)}
-                      showReportBtn={!qState.isReported}
+                      showReportBtn={!qState.isReported && !readOnly}
                     />
                   );
                 // Add more cases as needed
@@ -151,7 +158,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
             })()}
 
             {/* Explanation and Reporting */}
-            {(quizSubmitted || qState.isReported) && question.explanation && (
+            {(quizSubmitted || qState.isReported || readOnly) && question.explanation && (
               <div className="mt-4 p-4 bg-yellow-100 rounded-md">
                 <p className="text-yellow-800">{question.explanation}</p>
               </div>
@@ -203,7 +210,7 @@ const Quiz = ({ quizData, isContinue, onNextQuiz, onExitQuiz }) => {
             Exit Quiz
           </button>
 
-          {!isContinue && (
+          {!isContinue && !readOnly && (
             <button
               onClick={onNextQuiz}
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"

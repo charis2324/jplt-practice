@@ -279,3 +279,23 @@ export async function getQuizHistory() {
         throw error;
     }
 }
+
+export async function getQuizSessionResult(quizSessionId) {
+    if (!quizSessionId) {
+        throw new Error('Quiz session ID is required');
+    }
+    try {
+        const { data, error } = await supabase.rpc('get_quiz_session_result',
+            { p_quiz_session_id: quizSessionId }
+        )
+
+        if (error) {
+            throw new Error(`Failed to get quiz session result: ${error.message}`);
+        }
+
+        return data;
+    } catch (error) {
+        console.error('Error getting quiz session result:', error);
+        throw error;
+    }
+}

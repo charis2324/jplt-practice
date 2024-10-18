@@ -7,7 +7,7 @@ import QuizPage from './pages/QuizPage';
 import DashboardPage from './pages/DashboardPage';
 import QuizHistoryPage from './pages/QuizHistoryPage';
 import { BannerProvider } from './contexts/BannerContext';
-
+import QuizSessionResultPage from './pages/QuizSessionResultPage';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useContext(AuthContext)
@@ -31,6 +31,10 @@ const router = createHashRouter([
   {
     path: "history",
     element: (<PrivateRoute><UserNavbar><QuizHistoryPage /></UserNavbar></PrivateRoute>)
+  },
+  {
+    path: "history/:quizSessionId",
+    element: (<UserNavbar><QuizSessionResultPage /></UserNavbar>)
   },
   {
     path: "*",

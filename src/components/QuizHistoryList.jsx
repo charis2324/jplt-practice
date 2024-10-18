@@ -18,7 +18,7 @@ function QuizHistoryList({ quizHistory, isLoading }) {
                 <h1 className="text-3xl font-bold text-center">History</h1>
                 <div className="bg-white rounded-lg p-6 shadow-md">
                     {quizHistory?.map((hist, index) => (
-                        <QuizHistoryEntry key={hist.quiz_session_id} index={index} correctAnswers={hist.num_correct_questions} totalQuestions={hist.num_active_questions} quizDatetime={hist.submit_time} />
+                        <QuizHistoryEntry key={hist.quiz_session_id} index={index} correctAnswers={hist.num_correct_questions} totalQuestions={hist.num_active_questions} quizDatetime={hist.submit_time} quizSessionId={hist.quiz_session_id} />
                     ))}
                 </div>
             </div>
