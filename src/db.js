@@ -10,20 +10,23 @@ if (!supabaseUrl || !supabaseAnonKey) {
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 
-export async function initializeQuizSession(jlptLevel, numQuestions) {
+export async function buildQuiz(jlptLevel, numQuestions, mode) {
     try {
-        const { data, error } = await supabase.rpc('initialize_quiz_session_for_user', {
-            p_jlpt_level: jlptLevel,
-            p_num_questions: numQuestions
+        const { data, error } = await supabase.rpc('build_quiz', {
+            p_config: {
+                quiz_type: mode,
+                jlpt_level: jlptLevel,
+                num_questions: numQuestions
+            }
         });
 
         if (error) {
-            throw new Error(`Failed to initialize quiz session: ${error.message}`);
+            throw new Error(`Failed to build quiz: ${error.message}`);
         }
 
         return data;
     } catch (error) {
-        console.error('Error initializing quiz session:', error);
+        console.error('Error building quiz:', error);
         throw error;
     }
 }

@@ -1,11 +1,11 @@
-import React from 'react';
-
-const QuizConfigurator = ({ onConfigChange, currentConfig, onStart }) => {
+const QuizConfigurator = ({ onConfigChange, currentConfig, onStart, allowModeChange = false }) => {
   const options = [5, 10, 30, 50];
   const handleJLPTLevelCHange = (e) => {
     onConfigChange({ ...currentConfig, jlptLevel: Number(e.target.value) })
   }
-
+  const handleModeCHange = (e) => {
+    onConfigChange({ ...currentConfig, mode: e.target.value })
+  }
   return (
     <div className="max-w-md mx-auto mb-8 p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-4 text-center">Quiz Configuration</h2>
@@ -33,6 +33,15 @@ const QuizConfigurator = ({ onConfigChange, currentConfig, onStart }) => {
           <input type="radio" name="JLPTLevel" id="JLPTN4" value="4" checked={currentConfig.jlptLevel === 4} onChange={handleJLPTLevelCHange} />
         </div>
       </fieldset>
+      {allowModeChange && <fieldset>
+        <legend className="block mb-2 font-bold">Mode:</legend>
+        <div className="w-full p-2 rounded mb-4 space-x-2">
+          <label htmlFor="ModeAdaptive">Adaptive</label>
+          <input type="radio" name="Mode" id="ModeAdaptive" value="adaptive" checked={currentConfig.mode === "adaptive"} onChange={handleModeCHange} />
+          <label htmlFor="ModeRandom">Random</label>
+          <input type="radio" name="Mode" id="ModeRandom" value="random" checked={currentConfig.mode === "random"} onChange={handleModeCHange} />
+        </div>
+      </fieldset>}
       <button
         onClick={onStart}
         className="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300"

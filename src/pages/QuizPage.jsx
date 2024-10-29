@@ -3,7 +3,7 @@ import { useLocation } from 'react-router-dom';
 import Quiz from '../components/Quiz';
 import QuizConfigurator from '../components/QuizConfigurator';
 import QuestionInstruction from '../components/QuestionInstruction';
-import { getLatestInProgressSession, initializeQuizSession, continueQuizSession } from '../db';
+import { getLatestInProgressSession, buildQuiz, continueQuizSession } from '../db';
 import { AuthContext } from '../contexts/AuthContext';
 import QuizContinue from '../components/QuizContinue';
 import LoadingIndicator from '../components/LoadingIndicator';
@@ -12,7 +12,7 @@ const QuizPage = () => {
   const [quizData, setQuizData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [quizConfig, setQuizConfig] = useState({ questionCount: 5, jlptLevel: 4 });
+  const [quizConfig, setQuizConfig] = useState({ questionCount: 5, jlptLevel: 4, mode: "adaptive" });
   const [quizStarted, setQuizStarted] = useState(false);
   const [inProgressQuizSessionId, setInProgressQuizSessionId] = useState(null);
   const [isContinue, setIsContinue] = useState(false);
@@ -41,7 +41,7 @@ const QuizPage = () => {
       setQuizData(null);
       setError(null);
       getInProgressQuizSession();
-      setQuizConfig({ questionCount: 10, jlptLevel: 5 });
+      setQuizConfig({ questionCount: 10, jlptLevel: 5, mode: "adaptive" });
       setQuizStarted(false);
       setIsContinue(false);
 
@@ -61,7 +61,7 @@ const QuizPage = () => {
 
       try {
         const fetchedQuizData = await (is_new_quiz
-          ? initializeQuizSession(quizConfig.jlptLevel, quizConfig.questionCount)
+          ? buildQuiz(quizConfig.jlptLevel, quizConfig.questionCount, quizConfig.mode)
           : continueQuizSession());
         if (!fetchedQuizData) {
           throw new Error('No quiz data received');
@@ -76,7 +76,7 @@ const QuizPage = () => {
         setIsLoading(false);
       }
     },
-    [quizConfig.questionCount, quizConfig.jlptLevel]
+    [quizConfig.jlptLevel, quizConfig.questionCount, quizConfig.mode]
   );
 
   const handleNextQuiz = useCallback(async () => {
